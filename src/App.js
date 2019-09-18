@@ -4,6 +4,8 @@ import { List, Map, updateIn } from 'immutable';
 import visvalingam from './visvalingam'
 import closePolygon from './closePolygon'
 import isCircle from './isCircle'
+import Sidebar from "./sidebar";
+
 
 class App extends Component {
     constructor(props) {
@@ -54,7 +56,7 @@ class App extends Component {
     }
 
     preprocess(line) {
-        let newLine = visvalingam(line.toArray(), 10);
+        let newLine = visvalingam(line.toArray(), 5);
         newLine = closePolygon(newLine);
         console.log(isCircle(newLine));
         // if(isCircle(newLine)) {

@@ -1,12 +1,16 @@
+@import url('https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css');
+
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
-  margin: 20px;
 }
 
 .drawArea {
-  width: 400px;
-  height: 400px;
-  border: 1px solid black;
+  width: 95%;
+  margin-left: 5%;
+  margin-top: 0;
+  margin-right: 0;
+  height: 100vh;
+  border: 5px solid slateblue;
   float: left;
   cursor: crosshair;
 }
@@ -22,4 +26,8 @@ body {
 .drawing {
   width: 100%;
   height: 100%;
+}
+
+.ui.inverted.menu {
+  background: slateblue;
 }
