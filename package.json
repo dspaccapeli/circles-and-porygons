@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "immutable": "^4.0.0-rc.12",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "react-scripts": "3.1.1"
+    "react-scripts": "3.1.1",
+    "sterta": "^2.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
