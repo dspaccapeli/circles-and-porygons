@@ -1,7 +1,7 @@
 import React from 'react'
-import { Header, Icon, Image, Menu, Segment, Sidebar } from 'semantic-ui-react'
+import { Icon, Menu, Sidebar } from 'semantic-ui-react'
 
-const SidebarExampleVisible = () => (
+const SidebarDrawing = () => (
         <Sidebar
             as={Menu}
             animation='overlay'
@@ -27,4 +27,4 @@ const SidebarExampleVisible = () => (
 
 )
 
-export default SidebarExampleVisible
+export default SidebarDrawing;
