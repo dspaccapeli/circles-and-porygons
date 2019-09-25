@@ -8,7 +8,7 @@ export default function isCircle(polygon) {
             return false;
         }
     }
-    
+
     return true;
 }
 
