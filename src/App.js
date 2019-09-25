@@ -56,7 +56,7 @@ class App extends Component {
     }
 
     preprocess(line) {
-        let newLine = visvalingam(line.toArray(), 5);
+        let newLine = visvalingam(line.toArray(), 11);
         newLine = closePolygon(newLine);
         console.log(isCircle(newLine));
         // if(isCircle(newLine)) {
@@ -67,7 +67,6 @@ class App extends Component {
     }
 
     handleMouseUp() {
-        // this.setState({ isDrawing: false });
         this.setState(prevState =>  ({
             lines: updateIn(prevState.lines, [prevState.lines.size - 1], line => this.preprocess(line)),
             isDrawing: false
