@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@trendmicro/react-sidenav": "^0.4.5",
+    "bootstrap": "^4.3.1",
     "immutable": "^4.0.0-rc.12",
     "react": "^16.9.0",
+    "react-bootstrap-sidebar": "0.0.1",
     "react-dom": "^16.9.0",
     "react-scripts": "3.1.1",
+    "semantic-ui-react": "^0.88.1",
     "sterta": "^2.2.1"
   },
   "scripts": {
