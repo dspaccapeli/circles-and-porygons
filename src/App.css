@@ -5,8 +5,8 @@ body {
 }
 
 .drawArea {
-  width: 95%;
-  margin-left: 5%;
+  width: 90vw;
+  margin-left: 10vw;
   margin-top: 0;
   margin-right: 0;
   height: 100vh;
@@ -30,4 +30,8 @@ body {
 
 .ui.inverted.menu {
   background: royalblue;
+}
+
+.ui.thin.left.sidebar {
+  width: 10vw;
 }
