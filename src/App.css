@@ -10,7 +10,7 @@ body {
   margin-top: 0;
   margin-right: 0;
   height: 100vh;
-  border: 5px solid slateblue;
+  border: 5px solid royalblue;
   float: left;
   cursor: crosshair;
 }
@@ -29,5 +29,5 @@ body {
 }
 
 .ui.inverted.menu {
-  background: slateblue;
+  background: royalblue;
 }
