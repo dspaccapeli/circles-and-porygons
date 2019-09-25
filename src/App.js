@@ -61,11 +61,11 @@ class App extends Component {
 
         console.log(isCircle(newLine));
 
-        /*if(isCircle(newLine)) {
+        if(isCircle(newLine)) {
             return List(newLine)
         } else {
-            newLine = smoothPolygon(newLine)
-        }*/
+            // newLine = smoothPolygon(newLine)
+        }
 
         return List(newLine);
     }
@@ -110,21 +110,38 @@ class App extends Component {
                     onMouseDown={this.handleMouseDown}
                     onMouseMove={this.handleMouseMove}
                 >
-                    <Drawing lines={this.state.lines} />
+                    <Drawing lines={this.state.lines} isDrawing={this.state.isDrawing}/>
                 </div>
             </div>
         );
     }
 }
 
-function Drawing({ lines }) {
-    return (
-        <svg className="drawing">
-            {lines.map((line, index) => (
-                <DrawingLine key={index} line={line} />
-            ))}
-        </svg>
-    );
+function Drawing({ lines, isDrawing }) {
+
+    if (isDrawing){
+        return (
+            <svg className="drawing">
+                {lines.map((line, index) => isCircle(line.toArray()) && index !== lines.size-1 ? (
+                        <DrawingCircle key={index} line={line}/>
+                    ) : (
+                        <DrawingLine key={index} line={line}/>
+                    )
+                )}
+            </svg>
+        );
+    } else {
+        return (
+            <svg className="drawing">
+                {lines.map((line, index) => isCircle(line.toArray()) ? (
+                        <DrawingCircle key={index} line={line}/>
+                    ) : (
+                        <DrawingLine key={index} line={line}/>
+                    )
+                )}
+            </svg>
+        );
+    }
 }
 
 function DrawingLine({ line }) {
@@ -137,6 +154,54 @@ function DrawingLine({ line }) {
             .join(" L ");
 
     return <path className="path" d={pathData} />;
+}
+
+function DrawingCircle({ line }) {
+
+    let newLine = line.toArray();
+
+    let centroid = get_polygon_centroid(newLine);
+
+    let radius = Math.floor(Math.hypot(centroid.get('x')-newLine[0].get('x'), centroid.get('y')-newLine[0].get('y')));
+
+    return <circle cx={centroid.get('x')} cy={centroid.get('y')} r={radius} fill="none" stroke="black" strokeWidth="1"/>;
+}
+
+
+function get_polygon_centroid(pts) {
+    let first = pts[0], last = pts[pts.length-1];
+
+    console.log('pts_0', pts[0])
+    if (first.get('x') !== last.get('x') || first.get('y') !== last.get('y')) {
+        pts.push(first);
+    }
+    let twicearea=0,
+        x=0, y=0,
+        nPts = pts.length,
+        p1, p2, f;
+    for ( let i=0, j=nPts-1 ; i<nPts ; j=i++ ) {
+        p1 = pts[i]; p2 = pts[j];
+        f = (p1.get('y') - first.get('y')) * (p2.get('x') - first.get('x')) - (p2.get('y') - first.get('y')) * (p1.get('x') - first.get('x'));
+        console.log('f', f);
+        twicearea += f;
+        console.log('twicearea', twicearea)
+        x += (p1.get('x') + p2.get('x') - 2 * first.get('x')) * f;
+        console.log('x', x)
+        y += (p1.get('y') + p2.get('y') - 2 * first.get('y')) * f;
+        console.log('y', y)
+    }
+    f = twicearea * 3;
+
+    let centroidX = Math.floor(x/f + first.get('x'));
+    let centroidY = Math.floor(y/f + first.get('y'));
+
+    console.log('cX', centroidX);
+    console.log('cY', centroidY);
+
+    return new Map({
+        x: centroidX,
+        y: centroidY
+    });
 }
 
 
