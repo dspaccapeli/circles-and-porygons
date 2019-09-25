@@ -1,4 +1,4 @@
-export default function closePolygon(polygon) {
+export default function isCircle(polygon) {
     let i = 1;
 
     let avg = [];
