@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { List, Map, updateIn } from 'immutable';
+import { List, Map, updateIn, remove } from 'immutable';
 import visvalingam from './visvalingam'
 import closePolygon from './closePolygon'
 import isCircle from './isCircle'
@@ -68,10 +68,19 @@ class App extends Component {
     }
 
     handleMouseUp() {
-        this.setState(prevState =>  ({
-            lines: updateIn(prevState.lines, [prevState.lines.size - 1], line => this.preprocess(line)),
-            isDrawing: false
-        }));
+        let preprocessed = this.preprocess(this.state.lines.last());
+
+        if (!preprocessed.isEmpty()) {
+            this.setState(prevState =>  ({
+                lines: updateIn(prevState.lines, [prevState.lines.size - 1], _ => preprocessed),
+                isDrawing: false
+            }));
+        } else {
+            this.setState(prevState =>  ({
+                lines: remove(prevState.lines, prevState.lines.size - 1),
+                isDrawing: false
+            }));
+        }
     }
 
     relativeCoordinatesForEvent(mouseEvent) {
