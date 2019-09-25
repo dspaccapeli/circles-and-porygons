@@ -1,20 +1,14 @@
 export default function isCircle(polygon) {
     let i = 1;
 
-    let avg = [];
-
     for (i; i<polygon.length-1; i++){
         let angle = findAngle(polygon[i-1], polygon[i], polygon[i+1]);
-        console.log(angle);
-        avg.push(angle);
-
-        /*if( 20 <= Math.abs((angle % 90)-90) && Math.abs((angle % 90)-90) <= 70){
+        //console.log(angle);
+        if (angle < 110){
             return false;
-        }*/
+        }
     }
-
-    //console.log(Math.)
-
+    
     return true;
 }
 

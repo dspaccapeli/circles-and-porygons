@@ -58,12 +58,15 @@ class App extends Component {
     preprocess(line) {
         let newLine = visvalingam(line.toArray(), 11);
         newLine = closePolygon(newLine);
+
         console.log(isCircle(newLine));
-        if(isCircle(newLine)) {
+
+        /*if(isCircle(newLine)) {
             return List(newLine)
         } else {
             newLine = smoothPolygon(newLine)
-        }
+        }*/
+
         return List(newLine);
     }
 
