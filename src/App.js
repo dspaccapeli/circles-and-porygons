@@ -3,6 +3,7 @@ import './App.css';
 import { List, Map, updateIn, remove } from 'immutable';
 import visvalingam from './visvalingam'
 import closePolygon from './closePolygon'
+import smoothPolygon from './smoothPolygon'
 import isCircle from './isCircle'
 import Sidebar from "./sidebar";
 
@@ -64,7 +65,7 @@ class App extends Component {
         if(isCircle(newLine)) {
             return List(newLine)
         } else {
-            // newLine = smoothPolygon(newLine)
+            newLine = smoothPolygon(newLine);
         }
 
         return List(newLine);
