@@ -1,21 +1,23 @@
-export default function closePolygon(polygon) {
+export default function smoothPolygon(polygon) {
     let i = 1;
-
     let avg = [];
+    let NumberOfAngles = 1;
 
     for (i; i<polygon.length-1; i++){
         let angle = findAngle(polygon[i-1], polygon[i], polygon[i+1]);
         console.log(angle);
         avg.push(angle);
+        //console.log("Angle is: "+angle);
 
-        /*if( 20 <= Math.abs((angle % 90)-90) && Math.abs((angle % 90)-90) <= 70){
-            return false;
-        }*/
+        //If the angle is bigger than 140º and maybe smaller than 220º, then delete the points in between?
+        if(angle < 140){
+            console.log("This is a real angle:"+angle);
+            NumberOfAngles += 1;
+
+        }
     }
 
-    //console.log(Math.)
-
-    return true;
+    return NumberOfAngles;
 }
 
 function findAngle(A,B,C) {
