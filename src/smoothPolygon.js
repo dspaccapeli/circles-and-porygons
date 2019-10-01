@@ -5,8 +5,6 @@ export default function smoothPolygon(polygon) {
 
     for (i = 1; i<polygon.length-1; i++){
         let angle = findAngle(polygon[i-1], polygon[i], polygon[i+1]);
-        console.log("The angle is: "+angle);
-
         //If the angle is bigger than 145º then delete then store into the array to keep the indexes of the points to delete
         if(angle > 145){
             arrayOfIndex[indexForArray] = i;
@@ -17,7 +15,6 @@ export default function smoothPolygon(polygon) {
     //delete the points that are not necessary
     let n=0;
     for(i=0; i<arrayOfIndex.length; i++){
-        console.log(arrayOfIndex[i]);
         polygon.splice(arrayOfIndex[i]-n, 1);
         n++;
     }

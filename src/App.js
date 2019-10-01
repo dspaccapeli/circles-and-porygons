@@ -5,7 +5,7 @@ import visvalingam from './visvalingam'
 import closePolygon from './closePolygon'
 import smoothPolygon from './smoothPolygon'
 import isCircle from './isCircle'
-import Sidebar from "./sidebar";
+import Sidebar from "./Sidebar";
 
 
 class App extends Component {
@@ -14,7 +14,8 @@ class App extends Component {
 
         this.state = {
             lines: new List(),
-            isDrawing: false
+            isDrawing: false,
+            strokeColor: '#4284f5'
         };
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -56,11 +57,9 @@ class App extends Component {
         }));
     }
 
-    preprocess(line) {
+    preprocess = (line) =>{
         let newLine = visvalingam(line.toArray(), 11);
         newLine = closePolygon(newLine);
-
-        console.log(isCircle(newLine));
 
         if(isCircle(newLine)) {
             return List(newLine)
@@ -69,7 +68,7 @@ class App extends Component {
         }
 
         return List(newLine);
-    }
+    };
 
     handleMouseUp() {
         if (this.state.lines.last()) {
@@ -97,38 +96,43 @@ class App extends Component {
         });
     }
 
+    changeColor = (color) => {
+        this.setState({
+            strokeColor: color,
+        });
+    };
+
     render() {
-        this.state.lines.map((line, index) => {
-                // console.log('index :' + index);
+        /*this.state.lines.map((line, index) => {
                 console.log('line :' + line.toArray());
             }
-        );
+        );*/
 
         return (
             <div>
-                <Sidebar/>
+                <Sidebar onColorPicked={this.changeColor}/>
                 <div
                     className="drawArea"
                     ref="drawArea"
                     onMouseDown={this.handleMouseDown}
                     onMouseMove={this.handleMouseMove}
                 >
-                    <Drawing lines={this.state.lines} isDrawing={this.state.isDrawing}/>
+                    <Drawing lines={this.state.lines} color={this.state.strokeColor} isDrawing={this.state.isDrawing}/>
                 </div>
             </div>
         );
     }
 }
 
-function Drawing({ lines, isDrawing }) {
+function Drawing({ lines, color, isDrawing }) {
 
     if (isDrawing){
         return (
             <svg className="drawing">
                 {lines.map((line, index) => isCircle(line.toArray()) && index !== lines.size-1 ? (
-                        <DrawingCircle key={index} line={line}/>
+                        <DrawingCircle key={index} line={line} color={color}/>
                     ) : (
-                        <DrawingLine key={index} line={line}/>
+                        <DrawingLine key={index} line={line} color={color}/>
                     )
                 )}
             </svg>
@@ -137,9 +141,9 @@ function Drawing({ lines, isDrawing }) {
         return (
             <svg className="drawing">
                 {lines.map((line, index) => isCircle(line.toArray()) ? (
-                        <DrawingCircle key={index} line={line}/>
+                        <DrawingCircle key={index} line={line} color={color}/>
                     ) : (
-                        <DrawingLine key={index} line={line}/>
+                        <DrawingLine key={index} line={line} color={color}/>
                     )
                 )}
             </svg>
@@ -147,7 +151,7 @@ function Drawing({ lines, isDrawing }) {
     }
 }
 
-function DrawingLine({ line }) {
+function DrawingLine({ line, color }) {
 
     const pathData = "M " +
         line
@@ -156,10 +160,10 @@ function DrawingLine({ line }) {
             })
             .join(" L ");
 
-    return <path className="path" d={pathData} />;
+    return <path className="path" d={pathData} stroke={color}/>;
 }
 
-function DrawingCircle({ line }) {
+function DrawingCircle({ line, color }) {
 
     let newLine = line.toArray();
 
@@ -167,13 +171,12 @@ function DrawingCircle({ line }) {
 
     let radius = Math.floor(Math.hypot(centroid.get('x')-newLine[0].get('x'), centroid.get('y')-newLine[0].get('y')));
 
-    return <circle cx={centroid.get('x')} cy={centroid.get('y')} r={radius} fill="none" stroke="black" strokeWidth="1"/>;
+    return <circle cx={centroid.get('x')} cy={centroid.get('y')} r={radius} fill="none" stroke={color} strokeWidth="1"/>;
 }
 
 function get_polygon_centroid(pts) {
     let first = pts[0], last = pts[pts.length-1];
 
-    console.log('pts_0', pts[0])
     if (first.get('x') !== last.get('x') || first.get('y') !== last.get('y')) {
         pts.push(first);
     }
@@ -184,21 +187,14 @@ function get_polygon_centroid(pts) {
     for ( let i=0, j=nPts-1 ; i<nPts ; j=i++ ) {
         p1 = pts[i]; p2 = pts[j];
         f = (p1.get('y') - first.get('y')) * (p2.get('x') - first.get('x')) - (p2.get('y') - first.get('y')) * (p1.get('x') - first.get('x'));
-        console.log('f', f);
         twicearea += f;
-        console.log('twicearea', twicearea)
         x += (p1.get('x') + p2.get('x') - 2 * first.get('x')) * f;
-        console.log('x', x)
         y += (p1.get('y') + p2.get('y') - 2 * first.get('y')) * f;
-        console.log('y', y)
     }
     f = twicearea * 3;
 
     let centroidX = Math.floor(x/f + first.get('x'));
     let centroidY = Math.floor(y/f + first.get('y'));
-
-    console.log('cX', centroidX);
-    console.log('cY', centroidY);
 
     return new Map({
         x: centroidX,

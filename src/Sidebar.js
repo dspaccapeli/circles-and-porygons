@@ -2,21 +2,27 @@ import React from 'react'
 
 import { SketchPicker } from 'react-color'
 
-class SidebarDrawing extends React.Component {
+class Sidebar extends React.Component {
     constructor(props){
         super(props);
 
         this.state = {
             displayColorPicker: false,
+            colorPicked: '#4284f5',
         };
     }
 
-    handleClick = () => {
+    handleClickPicker = () => {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
     };
 
-    handleClose = () => {
+    handleClosePicker = () => {
         this.setState({ displayColorPicker: false })
+    };
+
+    handleChangeColor = (color) => {
+        this.setState({ colorPicked: color.hex });
+        this.props.onColorPicked(color.hex);
     };
 
     render() {
@@ -39,11 +45,13 @@ class SidebarDrawing extends React.Component {
                 <div>
                     Size
                 </div>
-                <div onClick={this.handleClick}>
+                <div onClick={this.handleClickPicker}>
                     Color
                     { this.state.displayColorPicker ? <div style={ popover }>
-                        <div style={ cover } onClick={ this.handleClose }/>
-                        <SketchPicker />
+                        <div style={ cover } onClick={ this.handleClosePicker }/>
+                        <SketchPicker
+                            onChangeComplete={ this.handleChangeColor }
+                        />
                     </div> : null }
                 </div>
             </div>
@@ -52,4 +60,4 @@ class SidebarDrawing extends React.Component {
 }
 
 
-export default SidebarDrawing;
+export default Sidebar;
