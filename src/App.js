@@ -71,18 +71,20 @@ class App extends Component {
     }
 
     handleMouseUp() {
-        let preprocessed = this.preprocess(this.state.lines.last());
+        if (this.state.lines.last()) {
+            let preprocessed = this.preprocess(this.state.lines.last());
 
-        if (!preprocessed.isEmpty()) {
-            this.setState(prevState =>  ({
-                lines: updateIn(prevState.lines, [prevState.lines.size - 1], _ => preprocessed),
-                isDrawing: false
-            }));
-        } else {
-            this.setState(prevState =>  ({
-                lines: remove(prevState.lines, prevState.lines.size - 1),
-                isDrawing: false
-            }));
+            if (!preprocessed.isEmpty()) {
+                this.setState(prevState => ({
+                    lines: updateIn(prevState.lines, [prevState.lines.size - 1], _ => preprocessed),
+                    isDrawing: false
+                }));
+            } else {
+                this.setState(prevState => ({
+                    lines: remove(prevState.lines, prevState.lines.size - 1),
+                    isDrawing: false
+                }));
+            }
         }
     }
 
@@ -166,7 +168,6 @@ function DrawingCircle({ line }) {
 
     return <circle cx={centroid.get('x')} cy={centroid.get('y')} r={radius} fill="none" stroke="black" strokeWidth="1"/>;
 }
-
 
 function get_polygon_centroid(pts) {
     let first = pts[0], last = pts[pts.length-1];

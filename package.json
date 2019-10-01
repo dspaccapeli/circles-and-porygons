@@ -10,6 +10,7 @@
     "immutable": "^4.0.0-rc.12",
     "react": "^16.9.0",
     "react-bootstrap-sidebar": "0.0.1",
+    "react-color": "^2.17.3",
     "react-dom": "^16.9.0",
     "react-scripts": "3.1.1",
     "semantic-ui-react": "^0.88.1",
