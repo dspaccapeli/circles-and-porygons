@@ -35,3 +35,14 @@ body {
 .ui.thin.left.sidebar {
   width: 10vw;
 }
+
+.path{
+  stroke: blue;
+  stroke-width: 2px;
+}
+
+circle{
+  stroke: red;
+  stroke-width: 2px;
+  fill: none;
+}
