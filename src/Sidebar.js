@@ -36,16 +36,40 @@ class Sidebar extends React.Component {
             bottom: '0px',
             left: '0px',
         };
+        const sidebar = {
+            width: '10%',
+            backgroundColor: 'royalblue',
+            position: 'absolute',
+            height: '100vh',
+            border: '3px solid royalblue',
+            alignItems: 'center',
+
+        };
+
+        const sidebarMenuElement = {
+            color: 'white',
+            cursor: 'pointer',
+            height: '60px',
+            fontSize: '20px',
+            textAlign: 'center',
+            verticalAlign: 'middle',
+            lineHeight: '60px',
+
+
+        };
 
         return (
-            <div>
-                <div>
+            <div style={ sidebar }>
+                <div style={ sidebarMenuElement }>
+                    Clear Canvas
+                </div>
+                <div style={ sidebarMenuElement }>
                     Pencil
                 </div>
-                <div>
+                <div style={ sidebarMenuElement }>
                     Size
                 </div>
-                <div onClick={this.handleClickPicker}>
+                <div  style={ sidebarMenuElement } onClick={this.handleClickPicker}>
                     Color
                     { this.state.displayColorPicker ? <div style={ popover }>
                         <div style={ cover } onClick={ this.handleClosePicker }/>
