@@ -1,5 +1,3 @@
-@import url('https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css');
-
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
 }
@@ -10,7 +8,7 @@ body {
   margin-top: 0;
   margin-right: 0;
   height: 100vh;
-  border: 5px solid royalblue;
+  border: 3px solid royalblue;
   float: left;
   cursor: crosshair;
 }

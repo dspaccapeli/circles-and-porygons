@@ -1,37 +1,55 @@
 import React from 'react'
-import { Icon, Menu, Sidebar } from 'semantic-ui-react'
 
 import { SketchPicker } from 'react-color'
 
 class SidebarDrawing extends React.Component {
+    constructor(props){
+        super(props);
+
+        this.state = {
+            displayColorPicker: false,
+        };
+    }
+
+    handleClick = () => {
+        this.setState({ displayColorPicker: !this.state.displayColorPicker })
+    };
+
+    handleClose = () => {
+        this.setState({ displayColorPicker: false })
+    };
 
     render() {
+        const popover = {
+            position: 'absolute',
+        };
+        const cover = {
+            position: 'fixed',
+            top: '0px',
+            right: '0px',
+            bottom: '0px',
+            left: '0px',
+        };
+
         return (
-            <Sidebar
-                as={Menu}
-                animation='overlay'
-                icon='labeled'
-                inverted
-                vertical
-                visible
-                width='thin'
-            >
-                <Menu.Item as='a'>
-                    <Icon name='paint brush'/>
+            <div>
+                <div>
                     Pencil
-                    <SketchPicker/>
-                </Menu.Item>
-                <Menu.Item as='a'>
-                    <Icon name='circle'/>
+                </div>
+                <div>
                     Size
-                </Menu.Item>
-                <Menu.Item as='a'>
-                    <Icon name='tint'/>
+                </div>
+                <div onClick={this.handleClick}>
                     Color
-                </Menu.Item>
-            </Sidebar>
+                    { this.state.displayColorPicker ? <div style={ popover }>
+                        <div style={ cover } onClick={ this.handleClose }/>
+                        <SketchPicker />
+                    </div> : null }
+                </div>
+            </div>
         );
     }
 }
+
 
 export default SidebarDrawing;
