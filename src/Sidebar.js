@@ -60,7 +60,10 @@ class Sidebar extends React.Component {
 
         return (
             <div style={ sidebar }>
-                <div style={ sidebarMenuElement }>
+                <div
+                    style={ sidebarMenuElement }
+                    onClick={() => this.props.onClearCanvas()}
+                >
                     Clear Canvas
                 </div>
                 <div style={ sidebarMenuElement }>
@@ -69,7 +72,9 @@ class Sidebar extends React.Component {
                 <div style={ sidebarMenuElement }>
                     Size
                 </div>
-                <div  style={ sidebarMenuElement } onClick={this.handleClickPicker}>
+                <div  style={ sidebarMenuElement }
+                      onClick={this.handleClickPicker}
+                >
                     Color
                     { this.state.displayColorPicker ? <div style={ popover }>
                         <div style={ cover } onClick={ this.handleClosePicker }/>
