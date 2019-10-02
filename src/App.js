@@ -15,7 +15,8 @@ class App extends Component {
         this.state = {
             lines: new List(),
             isDrawing: false,
-            strokeColor: '#4284f5'
+            strokeColor: '#4284f5',
+            strokeWidth: 5,
         };
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -102,6 +103,12 @@ class App extends Component {
         });
     };
 
+    changeStroke = (value) => {
+        this.setState({
+            strokeWidth: value,
+        });
+    };
+
     render() {
         /*this.state.lines.map((line, index) => {
                 console.log('line :' + line.toArray());
@@ -110,29 +117,28 @@ class App extends Component {
 
         return (
             <div>
-                <Sidebar onColorPicked={this.changeColor}/>
+                <Sidebar onColorPicked={this.changeColor} onStrokePicked={this.changeStroke} />
                 <div
                     className="drawArea"
                     ref="drawArea"
                     onMouseDown={this.handleMouseDown}
                     onMouseMove={this.handleMouseMove}
                 >
-                    <Drawing lines={this.state.lines} color={this.state.strokeColor} isDrawing={this.state.isDrawing}/>
+                    <Drawing lines={this.state.lines} color={this.state.strokeColor} isDrawing={this.state.isDrawing} width={this.state.strokeWidth} />
                 </div>
             </div>
         );
     }
 }
 
-function Drawing({ lines, color, isDrawing }) {
-
+function Drawing({ lines, color, isDrawing, width }) {
     if (isDrawing){
         return (
             <svg className="drawing">
                 {lines.map((line, index) => isCircle(line.toArray()) && index !== lines.size-1 ? (
-                        <DrawingCircle key={index} line={line} color={color}/>
+                    <DrawingCircle key={index} line={line} color={color} width={width}/>
                     ) : (
-                        <DrawingLine key={index} line={line} color={color}/>
+                        <DrawingLine key={index} line={line} color={color} width={width}/>
                     )
                 )}
             </svg>
@@ -141,9 +147,9 @@ function Drawing({ lines, color, isDrawing }) {
         return (
             <svg className="drawing">
                 {lines.map((line, index) => isCircle(line.toArray()) ? (
-                        <DrawingCircle key={index} line={line} color={color}/>
+                        <DrawingCircle key={index} line={line} color={color} width={width}/>
                     ) : (
-                        <DrawingLine key={index} line={line} color={color}/>
+                        <DrawingLine key={index} line={line} color={color} width={width}/>
                     )
                 )}
             </svg>
@@ -151,8 +157,7 @@ function Drawing({ lines, color, isDrawing }) {
     }
 }
 
-function DrawingLine({ line, color }) {
-
+function DrawingLine({ line, color, width }) {
     const pathData = "M " +
         line
             .map(p => {
@@ -160,10 +165,10 @@ function DrawingLine({ line, color }) {
             })
             .join(" L ");
 
-    return <path className="path" d={pathData} stroke={color}/>;
+    return <path className="path" d={pathData} stroke={color} strokeWidth={width} />;
 }
 
-function DrawingCircle({ line, color }) {
+function DrawingCircle({ line, color, width }) {
 
     let newLine = line.toArray();
 
@@ -171,7 +176,7 @@ function DrawingCircle({ line, color }) {
 
     let radius = Math.floor(Math.hypot(centroid.get('x')-newLine[0].get('x'), centroid.get('y')-newLine[0].get('y')));
 
-    return <circle cx={centroid.get('x')} cy={centroid.get('y')} r={radius} fill="none" stroke={color} strokeWidth="1"/>;
+    return <circle cx={centroid.get('x')} cy={centroid.get('y')} r={radius} fill="none" stroke={color} strokeWidth={width} />;
 }
 
 function get_polygon_centroid(pts) {

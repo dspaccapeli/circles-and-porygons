@@ -1,6 +1,7 @@
 import React from 'react'
-
-import { SketchPicker } from 'react-color'
+import { SketchPicker, BlockPicker } from 'react-color'
+import Slider from 'react-rangeslider'
+import 'react-rangeslider/lib/index.css'
 
 class Sidebar extends React.Component {
     constructor(props){
@@ -9,6 +10,7 @@ class Sidebar extends React.Component {
         this.state = {
             displayColorPicker: false,
             colorPicked: '#4284f5',
+            value: 5,
         };
     }
 
@@ -23,6 +25,11 @@ class Sidebar extends React.Component {
     handleChangeColor = (color) => {
         this.setState({ colorPicked: color.hex });
         this.props.onColorPicked(color.hex);
+    };
+
+    handleChange = (value) => {
+        this.setState({ value: value })
+        this.props.onStrokePicked(value);
     };
 
     render() {
@@ -43,7 +50,6 @@ class Sidebar extends React.Component {
             height: '100vh',
             border: '3px solid royalblue',
             alignItems: 'center',
-
         };
 
         const sidebarMenuElement = {
@@ -54,26 +60,38 @@ class Sidebar extends React.Component {
             textAlign: 'center',
             verticalAlign: 'middle',
             lineHeight: '60px',
-
-
         };
+
+        const patata = {
+            //backgroundColor:'blue',
+            zIndex: 0,
+        };
+
+        const { value } = this.state
 
         return (
             <div style={ sidebar }>
                 <div style={ sidebarMenuElement }>
                     Clear Canvas
                 </div>
-                <div style={ sidebarMenuElement }>
-                    Pencil
-                </div>
-                <div style={ sidebarMenuElement }>
-                    Size
+                <div className='slider orientation-reversed' style={ patata }>
+                    <div className='slider-group'>
+                        <div className='slider-vertical'>
+                            <Slider
+                                min={1}
+                                max={20}
+                                value={value}
+                                orientation='vertical'
+                                onChange={this.handleChange}
+                            />
+                        </div>
+                    </div>
                 </div>
                 <div  style={ sidebarMenuElement } onClick={this.handleClickPicker}>
                     Color
                     { this.state.displayColorPicker ? <div style={ popover }>
                         <div style={ cover } onClick={ this.handleClosePicker }/>
-                        <SketchPicker
+                        <BlockPicker
                             onChangeComplete={ this.handleChangeColor }
                         />
                     </div> : null }
