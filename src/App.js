@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { List, Map, updateIn, remove } from 'immutable';
+import { List, Map, updateIn, remove, fromJS } from 'immutable';
 import visvalingam from './visvalingam'
 import closePolygon from './closePolygon'
 import smoothPolygon from './smoothPolygon'
@@ -16,8 +16,9 @@ class App extends Component {
             lines: new List(),
             isDrawing: false,
             strokeColor: '#4284f5',
-            strokeWidth: 5,
+            strokeWidth: 1,
             colors: new List(),
+            widths: new List(),
         };
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -41,10 +42,12 @@ class App extends Component {
 
         const point = this.relativeCoordinatesForEvent(mouseEvent);
         const strokeColor = this.state.strokeColor;
+        const strokeWidth = this.state.strokeWidth;
 
         this.setState(prevState => ({
             lines: prevState.lines.push(new List([point])),
             colors: prevState.colors.push(strokeColor),
+            widths: prevState.widths.push(strokeWidth),
             isDrawing: true
         }));
     }
@@ -87,6 +90,7 @@ class App extends Component {
                 this.setState(prevState => ({
                     lines: remove(prevState.lines, prevState.lines.size - 1),
                     colors: remove(prevState.colors, prevState.colors.size - 1),
+                    widths: remove(prevState.widths, prevState.widths.size - 1),
                     isDrawing: false
                 }));
             }
@@ -104,7 +108,8 @@ class App extends Component {
     clearCanvas = () => {
         this.setState({
             lines: new List(),
-            colors: new List()
+            colors: new List(),
+            widths: new List()
         });
     };
 
@@ -114,9 +119,9 @@ class App extends Component {
         });
     };
 
-    changeStroke = (value) => {
+    changeStroke = (width) => {
         this.setState({
-            strokeWidth: value,
+            strokeWidth: width,
         });
     };
 
@@ -143,7 +148,7 @@ class App extends Component {
                         lines={this.state.lines}
                         color={this.state.colors}
                         isDrawing={this.state.isDrawing}
-                        width={this.state.strokeWidth}
+                        width={this.state.widths}
                     />
                 </div>
             </div>
@@ -153,16 +158,21 @@ class App extends Component {
 
 function Drawing({ lines, color, isDrawing, width }) {
 
-    const zipLineColor = lines.zip(color);
+    /*let zipLineColor = new List(lines.zip(color));
+    console.log(typeof zipLineColor)
+    zipLineColor = zipLineColor.zip(width);*/
+
+    const toZip = fromJS([lines, color, width]);
+    const zipped = toZip.get(0).zip(...toZip.rest());
 
     if (isDrawing){
 
         return (
             <svg className="drawing">
-                {zipLineColor.map((line, index) => isCircle(line[0].toArray()) && index !== lines.size-1 ? (
-                        <DrawingCircle key={index} line={line[0]} color={line[1]} width={width}/>
+                {zipped.map((line, index) => isCircle(line[0].toArray()) && index !== lines.size-1 ? (
+                        <DrawingCircle key={index} line={line[0]} color={line[1]} width={line[2]}/>
                     ) : (
-                        <DrawingLine key={index} line={line[0]} color={line[1]} width={width}/>
+                        <DrawingLine key={index} line={line[0]} color={line[1]} width={line[2]}/>
                     )
                 )}
             </svg>
@@ -171,10 +181,10 @@ function Drawing({ lines, color, isDrawing, width }) {
 
         return (
             <svg className="drawing">
-                {zipLineColor.map((line, index) => isCircle(line[0].toArray()) ? (
-                        <DrawingCircle key={index} line={line[0]} color={line[1]} width={width}/>
+                {zipped.map((line, index) => isCircle(line[0].toArray()) ? (
+                        <DrawingCircle key={index} line={line[0]} color={line[1]} width={line[2]}/>
                     ) : (
-                        <DrawingLine key={index} line={line[0]} color={line[1]} width={width}/>
+                        <DrawingLine key={index} line={line[0]} color={line[1]} width={line[2]}/>
                     )
                 )}
             </svg>

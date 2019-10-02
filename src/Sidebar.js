@@ -1,5 +1,5 @@
 import React from 'react'
-import { SketchPicker, BlockPicker } from 'react-color'
+import { BlockPicker } from 'react-color'
 import Slider from 'react-rangeslider'
 import 'react-rangeslider/lib/index.css'
 
