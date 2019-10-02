@@ -71,7 +71,10 @@ class Sidebar extends React.Component {
 
         return (
             <div style={ sidebar }>
-                <div style={ sidebarMenuElement }>
+                <div
+                    style={ sidebarMenuElement }
+                    onClick={() => this.props.onClearCanvas()}
+                >
                     Clear Canvas
                 </div>
                 <div className='slider orientation-reversed' style={ patata }>
@@ -87,7 +90,9 @@ class Sidebar extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div  style={ sidebarMenuElement } onClick={this.handleClickPicker}>
+                <div  style={ sidebarMenuElement }
+                      onClick={this.handleClickPicker}
+                >
                     Color
                     { this.state.displayColorPicker ? <div style={ popover }>
                         <div style={ cover } onClick={ this.handleClosePicker }/>

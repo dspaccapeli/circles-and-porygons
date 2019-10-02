@@ -17,6 +17,7 @@ class App extends Component {
             isDrawing: false,
             strokeColor: '#4284f5',
             strokeWidth: 5,
+            colors: new List(),
         };
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -39,9 +40,11 @@ class App extends Component {
         }
 
         const point = this.relativeCoordinatesForEvent(mouseEvent);
+        const strokeColor = this.state.strokeColor;
 
         this.setState(prevState => ({
             lines: prevState.lines.push(new List([point])),
+            colors: prevState.colors.push(strokeColor),
             isDrawing: true
         }));
     }
@@ -54,7 +57,7 @@ class App extends Component {
         const point = this.relativeCoordinatesForEvent(mouseEvent);
 
         this.setState(prevState =>  ({
-            lines: updateIn(prevState.lines, [prevState.lines.size - 1], line => line.push(point))
+            lines: updateIn(prevState.lines, [prevState.lines.size - 1], line => line.push(point)),
         }));
     }
 
@@ -83,6 +86,7 @@ class App extends Component {
             } else {
                 this.setState(prevState => ({
                     lines: remove(prevState.lines, prevState.lines.size - 1),
+                    colors: remove(prevState.colors, prevState.colors.size - 1),
                     isDrawing: false
                 }));
             }
@@ -96,6 +100,13 @@ class App extends Component {
             y: mouseEvent.clientY - boundingRect.top,
         });
     }
+
+    clearCanvas = () => {
+        this.setState({
+            lines: new List(),
+            colors: new List()
+        });
+    };
 
     changeColor = (color) => {
         this.setState({
@@ -117,14 +128,23 @@ class App extends Component {
 
         return (
             <div>
-                <Sidebar onColorPicked={this.changeColor} onStrokePicked={this.changeStroke} />
+                <Sidebar
+                    onColorPicked={this.changeColor}
+                    onClearCanvas={this.clearCanvas}
+                    onStrokePicked={this.changeStroke}
+                />
                 <div
                     className="drawArea"
                     ref="drawArea"
                     onMouseDown={this.handleMouseDown}
                     onMouseMove={this.handleMouseMove}
                 >
-                    <Drawing lines={this.state.lines} color={this.state.strokeColor} isDrawing={this.state.isDrawing} width={this.state.strokeWidth} />
+                    <Drawing
+                        lines={this.state.lines}
+                        color={this.state.colors}
+                        isDrawing={this.state.isDrawing}
+                        width={this.state.strokeWidth}
+                    />
                 </div>
             </div>
         );
@@ -132,24 +152,29 @@ class App extends Component {
 }
 
 function Drawing({ lines, color, isDrawing, width }) {
+
+    const zipLineColor = lines.zip(color);
+
     if (isDrawing){
+
         return (
             <svg className="drawing">
-                {lines.map((line, index) => isCircle(line.toArray()) && index !== lines.size-1 ? (
-                    <DrawingCircle key={index} line={line} color={color} width={width}/>
+                {zipLineColor.map((line, index) => isCircle(line[0].toArray()) && index !== lines.size-1 ? (
+                        <DrawingCircle key={index} line={line[0]} color={line[1]} width={width}/>
                     ) : (
-                        <DrawingLine key={index} line={line} color={color} width={width}/>
+                        <DrawingLine key={index} line={line[0]} color={line[1]} width={width}/>
                     )
                 )}
             </svg>
         );
     } else {
+
         return (
             <svg className="drawing">
-                {lines.map((line, index) => isCircle(line.toArray()) ? (
-                        <DrawingCircle key={index} line={line} color={color} width={width}/>
+                {zipLineColor.map((line, index) => isCircle(line[0].toArray()) ? (
+                        <DrawingCircle key={index} line={line[0]} color={line[1]} width={width}/>
                     ) : (
-                        <DrawingLine key={index} line={line} color={color} width={width}/>
+                        <DrawingLine key={index} line={line[0]} color={line[1]} width={width}/>
                     )
                 )}
             </svg>
