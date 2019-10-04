@@ -10,7 +10,7 @@ class Sidebar extends React.Component {
         this.state = {
             displayColorPicker: false,
             colorPicked: '#4284f5',
-            value: 5,
+            width: 5,
         };
     }
 
@@ -27,9 +27,9 @@ class Sidebar extends React.Component {
         this.props.onColorPicked(color.hex);
     };
 
-    handleChange = (value) => {
-        this.setState({ value: value })
-        this.props.onStrokePicked(value);
+    handleChangeWidth = (width) => {
+        this.setState({ width: width });
+        this.props.onStrokePicked(width);
     };
 
     render() {
@@ -62,13 +62,6 @@ class Sidebar extends React.Component {
             lineHeight: '60px',
         };
 
-        const patata = {
-            //backgroundColor:'blue',
-            zIndex: 0,
-        };
-
-        const { value } = this.state
-
         return (
             <div style={ sidebar }>
                 <div
@@ -77,15 +70,15 @@ class Sidebar extends React.Component {
                 >
                     Clear Canvas
                 </div>
-                <div className='slider orientation-reversed' style={ patata }>
+                <div className='slider orientation-reversed'>
                     <div className='slider-group'>
                         <div className='slider-vertical'>
                             <Slider
                                 min={1}
                                 max={20}
-                                value={value}
+                                value={this.state.width}
                                 orientation='vertical'
-                                onChange={this.handleChange}
+                                onChange={this.handleChangeWidth}
                             />
                         </div>
                     </div>

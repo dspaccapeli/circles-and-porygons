@@ -3,3 +3,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.rangeslider-vertical .rangeslider__labels{
+  visibility: hidden;
+}

@@ -16,7 +16,7 @@ class App extends Component {
             lines: new List(),
             isDrawing: false,
             strokeColor: '#4284f5',
-            strokeWidth: 1,
+            strokeWidth: 5,
             colors: new List(),
             widths: new List(),
         };
