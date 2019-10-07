@@ -10,7 +10,11 @@ export default function processPoints (line) {
     newLine = closePolygon(newLine);
 
     if(isCircle(newLine)) {
-        return List(newLine)
+        if(newLine.length > 3) {
+            return List(newLine)
+        } else {
+            return new List();
+        }
     } else {
         newLine = smoothPolygon(newLine);
     }

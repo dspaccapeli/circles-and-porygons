@@ -70,6 +70,12 @@ class Sidebar extends React.Component {
                 >
                     Clear Canvas
                 </div>
+                <div
+                    style={ sidebarMenuElement }
+                    onClick={() => this.props.onToggleHandDrawing()}
+                >
+                    Hand Drawing
+                </div>
                 <div className='slider orientation-reversed'>
                     <div className='slider-group'>
                         <div className='slider-vertical'>

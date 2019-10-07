@@ -13,7 +13,6 @@ export default function Drawing({ lines, color, isDrawing, width }) {
     const zipped = toZip.get(0).zip(...toZip.rest());
 
     if (isDrawing){
-
         return (
             <svg className="drawing">
                 {zipped.map((line, index) => isCircle(line[0].toArray()) && index !== lines.size-1 ? (

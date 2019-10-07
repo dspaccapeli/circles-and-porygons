@@ -5,6 +5,7 @@
   "dependencies": {
     "@babel/runtime": "^7.6.2",
     "babel-preset-react": "^6.24.1",
+    "handtrackjs": "0.0.13",
     "immutable": "^4.0.0-rc.12",
     "react": "^16.9.0",
     "react-color": "^2.17.3",
