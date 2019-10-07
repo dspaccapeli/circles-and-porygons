@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
 import { List, Map, updateIn, remove, fromJS } from 'immutable';
-import visvalingam from './visvalingam'
-import closePolygon from './closePolygon'
-import smoothPolygon from './smoothPolygon'
-import isCircle from './isCircle'
+import visvalingam from './utils/visvalingam'
+import closePolygon from './utils/closePolygon'
+import smoothPolygon from './utils/smoothPolygon'
+import isCircle from './utils/isCircle'
 import Sidebar from "./Sidebar";
 
 
