@@ -5,7 +5,6 @@ export default function isCircle(polygon) {
 
     for (i; i<polygon.length-1; i++){
         let angle = findAngle(polygon[i-1], polygon[i], polygon[i+1]);
-        //console.log(angle);
         if (angle < 110){
             return false;
         }

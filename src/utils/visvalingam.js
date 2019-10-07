@@ -4,7 +4,6 @@ let heap = require('sterta');
 // IMPLEMENTATION INSPIRATION
 // Simple Visvalingam
 // https://github.com/pirxpilot/vis-why
-//
 
 function area(a, b, c) {
     return Math.abs(
