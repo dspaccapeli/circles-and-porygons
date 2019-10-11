@@ -31,12 +31,12 @@
 .canvasbox {
   position: fixed;
   z-index: 1;
-  border-radius: 2px;
+  border-radius: 1px;
+  background: black;
   right: 10px;
   bottom: 10px;
-  width: 6vw;
-  height: 4vw;
   float: right;
+  visibility: hidden;
 }
 
 .border {
