@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { List, updateIn, remove } from 'immutable';
+import {List, updateIn, remove, Map} from 'immutable';
 
 import Sidebar from "./Sidebar";
 import Drawing from "./Drawing";
@@ -9,7 +9,6 @@ import relativeCoordinates from "./utils/relativeCoordinates";
 import processPoints from "./utils/processPoints";
 
 import * as handTrack from 'handtrackjs';
-
 
 class App extends Component {
     constructor(props) {
@@ -22,16 +21,29 @@ class App extends Component {
             strokeWidth: 5,
             colors: new List(),
             widths: new List(),
+            videoOn: false,
         };
 
         this.model = null;
-        this.videoOn = false;
+        this.modelParams = {
+            maxNumBoxes: 1,
+            scoreThreshold: 0.7,
+        };
+
+        this.currentHandCoordinates = { x: -1, y: -1};
+        this.previousHandCoordinates = { x: -1, y: -1};
+        this.handDrawing = false;
 
         this.canvasRef = React.createRef();
         this.videoRef = React.createRef();
         this.webcamCanvasRef = React.createRef();
 
         this.context = null;
+
+        this.handDrawingScaleFactorX = 1;
+        this.handDrawingScaleFactorY = 1;
+
+        this.modelLoaded = false;
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -42,13 +54,6 @@ class App extends Component {
         document.addEventListener("mouseup", this.handleMouseUp);
         document.addEventListener("keydown", this.handleKeyDown);
         document.addEventListener("keyup", this.handleKeyUp);
-
-        /*
-        handTrack.load().then(_model => {
-            this.model = _model;
-            console.log("loaded")
-        });
-        */
     }
 
     componentWillUnmount() {
@@ -58,17 +63,41 @@ class App extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        this.context = this.webcamCanvasRef.current.getContext('2d');
+        if (this.webcamCanvasRef.current){
+            this.context = this.webcamCanvasRef.current.getContext('2d');
+
+            this.handDrawingScaleFactorX = (this.canvasRef.current.offsetWidth) / this.videoRef.current.offsetWidth;
+            this.handDrawingScaleFactorY = this.canvasRef.current.offsetHeight / this.videoRef.current.offsetHeight;
+        }
     }
 
     toggleHandTracking = () => {
-        if (!this.videoOn) {
+        if (!this.model) {
+            handTrack.load().then(_model => {
+                this.model = _model;
+                this.model.setModelParameters(this.modelParams);
+                this.modelLoaded = true;
+                console.log("loaded");
+                this.switchHandTracking();
+            });
+        } else {
+            this.switchHandTracking();
+        }
+    };
+
+    switchHandTracking = () => {
+        if (!this.state.videoOn) {
             // updateNote.innerText = "Starting video"
-            this.startHandTracking();
+            this.setState({
+                videoOn: true,
+            }, () => this.startHandTracking());
+
         } else {
             // updateNote.innerText = "Stopping video"
             handTrack.stopVideo(this.videoRef.current).then();
-            this.videoOn = false;
+            this.setState({
+                videoOn: false,
+            });
             // updateNote.innerText = "Video stopped"
         }
     };
@@ -79,7 +108,6 @@ class App extends Component {
             let self = this;
             if (status) {
                 //updateNote.innerText = "Video started. Now tracking"
-                self.videoOn = true;
                 self.runDetection();
             } else {
                 //updateNote.innerText = "Please enable video"
@@ -88,22 +116,105 @@ class App extends Component {
     };
 
     runDetection = () => {
+        if (!this.videoRef.current){
+            return;
+        }
         this.model.detect(this.videoRef.current).then(predictions => {
-            console.log("Predictions: ", predictions);
+
+            if (!this.webcamCanvasRef.current){
+                return;
+            }
+
             this.model.renderPredictions(
                 predictions,
                 this.webcamCanvasRef.current,
                 this.webcamCanvasRef.current.getContext('2d'),
                 this.videoRef.current);
 
-            if (this.videoOn) {
+            if (predictions.length > 0){
+                this.previousHandCoordinates = this.currentHandCoordinates;
+
+                const x = predictions[0].bbox[0];
+                const y = predictions[0].bbox[1];
+                const width = predictions[0].bbox[2];
+                const height = predictions[0].bbox[3];
+
+                console.log("x", x)
+                console.log("y", y)
+
+                const middleValueX = x + width/2;
+                const middleValueY = y + height/2;
+                this.currentHandCoordinates.x = Math.floor(this.handDrawingScaleFactorX*middleValueX-this.canvasRef.current.getBoundingClientRect().left);
+                this.currentHandCoordinates.y = Math.floor(this.handDrawingScaleFactorY*middleValueY-this.canvasRef.current.getBoundingClientRect().top);
+
+                console.log(this.canvasRef.current.getBoundingClientRect().right)
+                console.log("hand x", this.currentHandCoordinates.x)
+                console.log("hand y", this.currentHandCoordinates.y)
+
+                if(this.handDrawing){
+                    this.drawHandStroke();
+                }
+            }
+
+
+            if (this.state.videoOn) {
                 requestAnimationFrame(this.runDetection);
             }
         });
     };
 
+    drawHandStroke(){
+            const point = new Map({
+                x: Math.floor(this.currentHandCoordinates.x*this.handDrawingScaleFactorX),
+                y: Math.floor(this.currentHandCoordinates.y*this.handDrawingScaleFactorY),
+            });
+
+            console.log(point);
+
+            // if first stroke
+            if (this.state.lines.size === 0){
+                    this.setState(prevState => ({
+                        lines: prevState.lines.push(new List([point])),
+                        colors: prevState.colors.push(prevState.strokeColor),
+                        widths: prevState.widths.push(prevState.strokeWidth),
+                        isDrawing: true
+                    }));
+            } else if (this.state.lines.get(-1).size > 0 && !this.state.isDrawing) {
+                this.setState(prevState => ({
+                    lines: prevState.lines.push(new List([point])),
+                    colors: prevState.colors.push(prevState.strokeColor),
+                    widths: prevState.widths.push(prevState.strokeWidth),
+                    isDrawing: true
+                }));
+            } else if (this.state.lines.get(-1).size > 0 && this.state.isDrawing) {
+                if(this.handDrawing){
+                    this.setState(prevState => ({
+                        lines: updateIn(prevState.lines, [prevState.lines.size - 1], line => line.push(point)),
+                    }));
+                } else {
+                    if (this.state.lines.last()) {
+                        let processedLine = processPoints(this.state.lines.last());
+
+                        if (!processedLine.isEmpty()) {
+                            this.setState(prevState => ({
+                                lines: updateIn(prevState.lines, [prevState.lines.size - 1], _ => processedLine),
+                                isDrawing: false
+                            }));
+                        } else {
+                            this.setState(prevState => ({
+                                lines: remove(prevState.lines, prevState.lines.size - 1),
+                                colors: remove(prevState.colors, prevState.colors.size - 1),
+                                widths: remove(prevState.widths, prevState.widths.size - 1),
+                                isDrawing: false
+                            }));
+                        }
+                    }
+                }
+            }
+    }
+
     handleMouseDown(mouseEvent) {
-        if (mouseEvent.button !== 0) {
+        if (mouseEvent.button !== 0 || this.state.videoOn) {
             return;
         }
 
@@ -118,7 +229,7 @@ class App extends Component {
     }
 
     handleMouseMove(mouseEvent) {
-        if (!this.state.isDrawing) {
+        if (!this.state.isDrawing || this.state.videoOn) {
             return;
         }
 
@@ -130,6 +241,10 @@ class App extends Component {
     }
 
     handleMouseUp() {
+        if (this.state.videoOn){
+            return;
+        }
+
         if (this.state.lines.last()) {
             let processedLine = processPoints(this.state.lines.last());
 
@@ -150,14 +265,36 @@ class App extends Component {
     }
 
     handleKeyDown = (keyEvent) => {
-        if(keyEvent.code === "KeyD"){
-            console.log("down D")
+        if(keyEvent.code === "KeyD" && !this.state.isDrawing) {
+            if (this.state.videoOn) {
+                this.handDrawing = true;
+
+            }
         }
     };
 
     handleKeyUp = (keyEvent) => {
         if(keyEvent.code === "KeyD"){
-            console.log("up D")
+
+            this.handDrawing = false;
+
+            if (this.state.lines.last()) {
+                let processedLine = processPoints(this.state.lines.last());
+
+                if (!processedLine.isEmpty()) {
+                    this.setState(prevState => ({
+                        lines: updateIn(prevState.lines, [prevState.lines.size - 1], _ => processedLine),
+                        isDrawing: false
+                    }));
+                } else {
+                    this.setState(prevState => ({
+                        lines: remove(prevState.lines, prevState.lines.size - 1),
+                        colors: remove(prevState.colors, prevState.colors.size - 1),
+                        widths: remove(prevState.widths, prevState.widths.size - 1),
+                        isDrawing: false
+                    }));
+                }
+            }
         }
     };
 
@@ -203,13 +340,18 @@ class App extends Component {
                         width={this.state.widths}
                     />
                 </div>
-                <video className="canvasbox"
-                       autoPlay="autoplay"
-                       ref={this.videoRef}
-                />
-                <canvas className="border canvasbox"
-                        ref={this.webcamCanvasRef}
-                />
+                {
+                    this.state.videoOn ? (
+                        <div>
+                            <video className="canvasbox"
+                                   autoPlay="autoplay"
+                                   ref={this.videoRef}
+                            />
+                            <canvas className="border canvasbox"
+                                    ref={this.webcamCanvasRef}/>
+                        </div>
+                    ): null
+                }
             </div>
         );
     }
