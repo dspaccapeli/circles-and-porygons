@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
+
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import {List, updateIn, remove, Map} from 'immutable';
 
 import Sidebar from "./Sidebar";
@@ -22,7 +25,11 @@ class App extends Component {
             colors: new List(),
             widths: new List(),
             videoOn: false,
+            modelIsLoading: false,
         };
+
+        this.modelLoaded = false;
+        this.detecting = null;
 
         this.model = null;
         this.modelParams = {
@@ -42,8 +49,6 @@ class App extends Component {
 
         this.handDrawingScaleFactorX = 1;
         this.handDrawingScaleFactorY = 1;
-
-        this.modelLoaded = false;
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -72,12 +77,16 @@ class App extends Component {
     }
 
     toggleHandTracking = () => {
-        if (!this.model) {
+        if (!this.model && !this.modelLoaded) {
+            this.setState({
+                modelIsLoading: true,
+            });
+
             handTrack.load().then(_model => {
                 this.model = _model;
                 this.model.setModelParameters(this.modelParams);
                 this.modelLoaded = true;
-                console.log("loaded");
+
                 this.switchHandTracking();
             });
         } else {
@@ -87,18 +96,21 @@ class App extends Component {
 
     switchHandTracking = () => {
         if (!this.state.videoOn) {
-            // updateNote.innerText = "Starting video"
+            this.modelLoaded = true;
+
             this.setState({
+                modelIsLoading: true,
                 videoOn: true,
             }, () => this.startHandTracking());
 
         } else {
-            // updateNote.innerText = "Stopping video"
             handTrack.stopVideo(this.videoRef.current).then();
+            this.modelLoaded = false;
+            this.detecting = null;
             this.setState({
+                modelIsLoading: false,
                 videoOn: false,
             });
-            // updateNote.innerText = "Video stopped"
         }
     };
 
@@ -107,10 +119,7 @@ class App extends Component {
             console.log("video started", status);
             let self = this;
             if (status) {
-                //updateNote.innerText = "Video started. Now tracking"
                 self.runDetection();
-            } else {
-                //updateNote.innerText = "Please enable video"
             }
         });
     };
@@ -139,17 +148,10 @@ class App extends Component {
                 const width = predictions[0].bbox[2];
                 const height = predictions[0].bbox[3];
 
-                console.log("x", x)
-                console.log("y", y)
-
                 const middleValueX = x + width/2;
                 const middleValueY = y + height/2;
                 this.currentHandCoordinates.x = Math.floor(this.handDrawingScaleFactorX*middleValueX-this.canvasRef.current.getBoundingClientRect().left);
                 this.currentHandCoordinates.y = Math.floor(this.handDrawingScaleFactorY*middleValueY-this.canvasRef.current.getBoundingClientRect().top);
-
-                console.log(this.canvasRef.current.getBoundingClientRect().right)
-                console.log("hand x", this.currentHandCoordinates.x)
-                console.log("hand y", this.currentHandCoordinates.y)
 
                 if(this.handDrawing){
                     this.drawHandStroke();
@@ -164,53 +166,53 @@ class App extends Component {
     };
 
     drawHandStroke(){
-            const point = new Map({
-                x: Math.floor(this.currentHandCoordinates.x*this.handDrawingScaleFactorX),
-                y: Math.floor(this.currentHandCoordinates.y*this.handDrawingScaleFactorY),
-            });
+        const point = new Map({
+            x: Math.floor(this.currentHandCoordinates.x*this.handDrawingScaleFactorX),
+            y: Math.floor(this.currentHandCoordinates.y*this.handDrawingScaleFactorY),
+        });
 
-            console.log(point);
+        console.log(point);
 
-            // if first stroke
-            if (this.state.lines.size === 0){
-                    this.setState(prevState => ({
-                        lines: prevState.lines.push(new List([point])),
-                        colors: prevState.colors.push(prevState.strokeColor),
-                        widths: prevState.widths.push(prevState.strokeWidth),
-                        isDrawing: true
-                    }));
-            } else if (this.state.lines.get(-1).size > 0 && !this.state.isDrawing) {
+        // if first stroke
+        if (this.state.lines.size === 0){
+            this.setState(prevState => ({
+                lines: prevState.lines.push(new List([point])),
+                colors: prevState.colors.push(prevState.strokeColor),
+                widths: prevState.widths.push(prevState.strokeWidth),
+                isDrawing: true
+            }));
+        } else if (this.state.lines.get(-1).size > 0 && !this.state.isDrawing) {
+            this.setState(prevState => ({
+                lines: prevState.lines.push(new List([point])),
+                colors: prevState.colors.push(prevState.strokeColor),
+                widths: prevState.widths.push(prevState.strokeWidth),
+                isDrawing: true
+            }));
+        } else if (this.state.lines.get(-1).size > 0 && this.state.isDrawing) {
+            if(this.handDrawing){
                 this.setState(prevState => ({
-                    lines: prevState.lines.push(new List([point])),
-                    colors: prevState.colors.push(prevState.strokeColor),
-                    widths: prevState.widths.push(prevState.strokeWidth),
-                    isDrawing: true
+                    lines: updateIn(prevState.lines, [prevState.lines.size - 1], line => line.push(point)),
                 }));
-            } else if (this.state.lines.get(-1).size > 0 && this.state.isDrawing) {
-                if(this.handDrawing){
-                    this.setState(prevState => ({
-                        lines: updateIn(prevState.lines, [prevState.lines.size - 1], line => line.push(point)),
-                    }));
-                } else {
-                    if (this.state.lines.last()) {
-                        let processedLine = processPoints(this.state.lines.last());
+            } else {
+                if (this.state.lines.last()) {
+                    let processedLine = processPoints(this.state.lines.last());
 
-                        if (!processedLine.isEmpty()) {
-                            this.setState(prevState => ({
-                                lines: updateIn(prevState.lines, [prevState.lines.size - 1], _ => processedLine),
-                                isDrawing: false
-                            }));
-                        } else {
-                            this.setState(prevState => ({
-                                lines: remove(prevState.lines, prevState.lines.size - 1),
-                                colors: remove(prevState.colors, prevState.colors.size - 1),
-                                widths: remove(prevState.widths, prevState.widths.size - 1),
-                                isDrawing: false
-                            }));
-                        }
+                    if (!processedLine.isEmpty()) {
+                        this.setState(prevState => ({
+                            lines: updateIn(prevState.lines, [prevState.lines.size - 1], _ => processedLine),
+                            isDrawing: false
+                        }));
+                    } else {
+                        this.setState(prevState => ({
+                            lines: remove(prevState.lines, prevState.lines.size - 1),
+                            colors: remove(prevState.colors, prevState.colors.size - 1),
+                            widths: remove(prevState.widths, prevState.widths.size - 1),
+                            isDrawing: false
+                        }));
                     }
                 }
             }
+        }
     }
 
     handleMouseDown(mouseEvent) {
@@ -326,6 +328,18 @@ class App extends Component {
                     onClearCanvas={this.clearCanvas}
                     onStrokePicked={this.changeStroke}
                     onToggleHandDrawing={this.toggleHandTracking}
+                    onModelLoading={()=>{
+                            if (this.modelLoaded){
+                                return "Stop hand drawing";
+                            }
+                            if (this.state.modelIsLoading){
+                                return "loading...";
+                            }
+                            return null
+                        }
+                    }
+                    onModelWorking={this.detecting}
+
                 />
                 <div
                     className="drawArea"
