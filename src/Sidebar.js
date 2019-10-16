@@ -53,10 +53,8 @@ class Sidebar extends React.Component {
         };
 
         const sidebarMenuElement = {
-            color: 'white',
             cursor: 'pointer',
             height: '60px',
-            fontSize: '20px',
             textAlign: 'center',
             verticalAlign: 'middle',
             lineHeight: '60px',
@@ -64,17 +62,17 @@ class Sidebar extends React.Component {
 
         return (
             <div style={ sidebar }>
-                <div
+                <div className="sidebarItemMenu"
                     style={ sidebarMenuElement }
                     onClick={() => this.props.onClearCanvas()}
                 >
-                    Clear Canvas
+                    Clear
                 </div>
-                <div
+                <div className="sidebarItemMenu"
                     style={ sidebarMenuElement }
                     onClick={() => this.props.onToggleHandDrawing()}
                 >
-                    Hand Drawing
+                    HandsDraw
                 </div>
                 <div className='slider orientation-reversed'>
                     <div className='slider-group'>
@@ -89,8 +87,9 @@ class Sidebar extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div  style={ sidebarMenuElement }
-                      onClick={this.handleClickPicker}
+                <div className="sidebarItemMenu"
+                     style={ sidebarMenuElement }
+                     onClick={this.handleClickPicker}
                 >
                     Color
                     { this.state.displayColorPicker ? <div style={ popover }>
