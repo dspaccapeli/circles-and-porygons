@@ -1,3 +1,21 @@
+body{
+  font-family: 'Varela Round', sans-serif;
+}
+
+/*
+.title-style{
+  font-size: 25px;
+  font-family: ColorTube Regular;
+  padding-top: 20px;
+}
+*/
+
+.sidebarItemMenu{
+  font-family: 'Varela Round', sans-serif;
+  font-size: 20px;
+  color: white;
+}
+
 .drawArea {
   width: 90vw;
   margin-left: 10vw;
