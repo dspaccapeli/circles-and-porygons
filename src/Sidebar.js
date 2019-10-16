@@ -74,7 +74,8 @@ class Sidebar extends React.Component {
                 >
                     HandsDraw
                 </div>
-                <div style={ sidebarMenuElement }>
+                <div className="sidebarItemMenu"
+                    style={ sidebarMenuElement }>
                     Width
                 </div>
                 <div className='slider orientation-reversed'>
