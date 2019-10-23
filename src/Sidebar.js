@@ -3,7 +3,7 @@ import { TwitterPicker } from 'react-color'
 import Slider from 'react-rangeslider'
 import 'react-rangeslider/lib/index.css'
 
-import Button from 'react-bootstrap/Button';
+//import Button from 'react-bootstrap/Button';
 
 class Sidebar extends React.Component {
     constructor(props){
@@ -59,10 +59,8 @@ class Sidebar extends React.Component {
         };
 
         const sidebarMenuElement = {
-            cursor: 'pointer',
             textAlign: 'center',
             verticalAlign: 'middle',
-            lineHeight: '40px',
             gridRowGap: '5px'
         };
 
@@ -78,22 +76,25 @@ class Sidebar extends React.Component {
             background: '#fff',
             borderRadius: '1px',
             boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
-            display: 'inline-block',
+            display: 'inline-table',
             cursor: 'pointer',
+            width: '16px',
+            height: '16px',
             marginLeft: '10px'
         };
 
         return (
             <div style={ sidebar }>
-                <Button
+                <button
                     style={ sidebarMenuElement }
+                    className="btn-secondary"
                     onClick={() => this.props.onClearCanvas()}
                     variant="light"
                 >
                     Clear Canvas
-                </Button>
-                <div style={ Object.assign({}, sidebarMenuElement, {color: 'white'})}>
-                    Color
+                </button>
+                <div style={ Object.assign({}, sidebarMenuElement, {color: 'white'}, {alignItems: 'baseline'})} className="row">
+                    <p>Color</p>
                     <div
                         style={ squareContainer }
                         onClick={this.handleClickPicker}
@@ -108,7 +109,7 @@ class Sidebar extends React.Component {
                     </div> : null }
                 </div>
                 <div style={ Object.assign({}, sidebarMenuElement, {color: 'white'}) }>
-                    Width
+                    <p>Width</p>
                 </div>
                 <div className='slider orientation-reversed'>
                     <div className='slider-group'>
@@ -123,14 +124,15 @@ class Sidebar extends React.Component {
                         </div>
                     </div>
                 </div>
-                <Button
+                <button
                     style={ sidebarMenuElement }
+                    className="btn-danger"
                     onClick={() => this.props.onToggleHandDrawing()}
                     disabled={this.props.onModelLoading() == "loading..."}
                 >
                     { this.props.onModelLoading() ? <div dangerouslySetInnerHTML={{__html: this.props.onModelLoading()}}/> : <div> Hand Drawing </div> }
                     {/* this.props.onModelWorking ? <div dangerouslySetInnerHTML={{__html: this.props.onModelWorking}}/> : null */}
-                </Button>
+                </button>
             </div>
         );
     }

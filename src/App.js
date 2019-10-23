@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 
 import {List, updateIn, remove, Map} from 'immutable';
 
