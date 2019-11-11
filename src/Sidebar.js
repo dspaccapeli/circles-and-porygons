@@ -1,14 +1,15 @@
+// Import React components
 import React from 'react'
+// Import a Color Picker implementation
 import { TwitterPicker } from 'react-color'
+// Import a Slider implementation
 import Slider from 'react-rangeslider'
 import 'react-rangeslider/lib/index.css'
-
-//import Button from 'react-bootstrap/Button';
 
 class Sidebar extends React.Component {
     constructor(props){
         super(props);
-
+        // Initialize React state - they trigger re-rendering
         this.state = {
             displayColorPicker: false,
             colorPicked: '#4284f5',
@@ -16,25 +17,24 @@ class Sidebar extends React.Component {
         };
     }
 
+    // Setup event handlers
     handleClickPicker = () => {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
     };
-
     handleClosePicker = () => {
         this.setState({ displayColorPicker: false })
     };
-
     handleChangeColor = (color) => {
         this.setState({ colorPicked: color.hex });
         this.props.onColorPicked(color.hex);
     };
-
     handleChangeWidth = (width) => {
         this.setState({ width: width });
         this.props.onStrokePicked(width);
     };
 
     render() {
+        // Initialize inline styiling
         const popover = {
             position: 'absolute',
         };
@@ -82,7 +82,7 @@ class Sidebar extends React.Component {
             height: '16px',
             marginLeft: '10px'
         };
-
+        // Render the sidebar element by element
         return (
             <div style={ sidebar }>
                 <button
@@ -131,7 +131,6 @@ class Sidebar extends React.Component {
                     disabled={this.props.onModelLoading() == "loading..."}
                 >
                     { this.props.onModelLoading() ? <div dangerouslySetInnerHTML={{__html: this.props.onModelLoading()}}/> : <div> Hand Drawing </div> }
-                    {/* this.props.onModelWorking ? <div dangerouslySetInnerHTML={{__html: this.props.onModelWorking}}/> : null */}
                 </button>
             </div>
         );
