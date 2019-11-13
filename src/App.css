@@ -16,8 +16,7 @@ body{
 }
 
 .drawArea {
-  width: 90vw;
-  margin-left: 10vw;
+  width: 100vw;
   margin-top: 0;
   margin-right: 0;
   height: 100vh;
@@ -27,7 +26,6 @@ body{
 }
 
 .path {
-  fill: none;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
@@ -41,9 +39,11 @@ body{
   background: royalblue;
 }
 
+/*
 .ui.thin.left.sidebar {
   width: 10vw;
 }
+*/
 
 .canvasbox {
   position: fixed;

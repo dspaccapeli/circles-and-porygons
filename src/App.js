@@ -21,13 +21,18 @@ class App extends Component {
             lines: new List(),
             isDrawing: false,
             strokeColor: '#4284f5',
+            fillColor: 'transparent',
             strokeWidth: 5,
             colors: new List(),
+            fills: new List(),
             widths: new List(),
+            isExtraPrettyfied: new List(),
             videoOn: false,
             modelIsLoading: false,
+            extraPrettify: false,
         };
 
+        this.extraPrettifyStatus = false;
         this.modelLoaded = false;
         this.detecting = null;
 
@@ -76,6 +81,23 @@ class App extends Component {
         }
     }
 
+    toggleExtraPrettify = () => {
+        if(!this.extraPrettifyStatus){
+            this.setState({
+                extraPrettify: true,
+            });
+            this.extraPrettifyStatus = true;
+            console.log("prettifying");
+        } else{
+            this.setState({
+                extraPrettify: false,
+            });
+            this.extraPrettifyStatus =false;
+            console.log("NOT prettifying");
+        }
+        console.log(this.extraPrettifyStatus);
+    }
+
     toggleHandTracking = () => {
         if (!this.model && !this.modelLoaded) {
             this.setState({
@@ -92,7 +114,7 @@ class App extends Component {
         } else {
             this.switchHandTracking();
         }
-    };
+    }
 
     switchHandTracking = () => {
         if (!this.state.videoOn) {
@@ -178,14 +200,18 @@ class App extends Component {
             this.setState(prevState => ({
                 lines: prevState.lines.push(new List([point])),
                 colors: prevState.colors.push(prevState.strokeColor),
+                fills: prevState.fills.push(prevState.fillColor),
                 widths: prevState.widths.push(prevState.strokeWidth),
+                isExtraPrettyfied: prevState.isExtraPrettyfied.push(prevState.extraPrettify),
                 isDrawing: true
             }));
         } else if (this.state.lines.get(-1).size > 0 && !this.state.isDrawing) {
             this.setState(prevState => ({
                 lines: prevState.lines.push(new List([point])),
                 colors: prevState.colors.push(prevState.strokeColor),
+                fills: prevState.fills.push(prevState.fillColor),
                 widths: prevState.widths.push(prevState.strokeWidth),
+                isExtraPrettyfied: prevState.isExtraPrettyfied.push(prevState.extraPrettify),
                 isDrawing: true
             }));
         } else if (this.state.lines.get(-1).size > 0 && this.state.isDrawing) {
@@ -206,7 +232,9 @@ class App extends Component {
                         this.setState(prevState => ({
                             lines: remove(prevState.lines, prevState.lines.size - 1),
                             colors: remove(prevState.colors, prevState.colors.size - 1),
+                            fills: remove(prevState.fills, prevState.fills.size - 1),
                             widths: remove(prevState.widths, prevState.widths.size - 1),
+                            isExtraPrettyfied: remove(prevState.isExtraPrettyfied, prevState.isExtraPrettyfied.size - 1),
                             isDrawing: false
                         }));
                     }
@@ -225,7 +253,9 @@ class App extends Component {
         this.setState(prevState => ({
             lines: prevState.lines.push(new List([point])),
             colors: prevState.colors.push(prevState.strokeColor),
+            fills: prevState.fills.push(prevState.fillColor),
             widths: prevState.widths.push(prevState.strokeWidth),
+            isExtraPrettyfied: prevState.isExtraPrettyfied.push(prevState.extraPrettify),
             isDrawing: true
         }));
     }
@@ -259,7 +289,9 @@ class App extends Component {
                 this.setState(prevState => ({
                     lines: remove(prevState.lines, prevState.lines.size - 1),
                     colors: remove(prevState.colors, prevState.colors.size - 1),
+                    fills: remove(prevState.fills, prevState.fills.size - 1),
                     widths: remove(prevState.widths, prevState.widths.size - 1),
+                    isExtraPrettyfied: remove(prevState.isExtraPrettyfied, prevState.isExtraPrettyfied.size - 1),
                     isDrawing: false
                 }));
             }
@@ -292,7 +324,9 @@ class App extends Component {
                     this.setState(prevState => ({
                         lines: remove(prevState.lines, prevState.lines.size - 1),
                         colors: remove(prevState.colors, prevState.colors.size - 1),
+                        fills: remove(prevState.fills, prevState.fills.size - 1),
                         widths: remove(prevState.widths, prevState.widths.size - 1),
+                        isExtraPrettyfied: remove(prevState.isExtraPrettyfied, prevState.isExtraPrettyfied.size - 1),
                         isDrawing: false
                     }));
                 }
@@ -304,13 +338,21 @@ class App extends Component {
         this.setState({
             lines: new List(),
             colors: new List(),
-            widths: new List()
+            fills: new List(),
+            widths: new List(),
+            isExtraPrettyfied: new List(),
         });
     };
 
     changeColor = (color) => {
         this.setState({
             strokeColor: color,
+        });
+    };
+
+    changeColorFill = (color) => {
+        this.setState({
+            fillColor: color,
         });
     };
 
@@ -325,8 +367,20 @@ class App extends Component {
             <div>
                 <Sidebar
                     onColorPicked={this.changeColor}
+                    onColorPickedFill={this.changeColorFill}
                     onClearCanvas={this.clearCanvas}
                     onStrokePicked={this.changeStroke}
+                    onTogglePrettify={this.toggleExtraPrettify}
+                    onTogglePreffifyStatus={()=>{
+                            if (this.extraPrettifyStatus){
+                                return "Normal prettify";
+                            }
+                            else{
+                                return "Extra prettify";
+                            }
+                            return null
+                        }
+                    }
                     onToggleHandDrawing={this.toggleHandTracking}
                     onModelLoading={()=>{
                             if (this.modelLoaded){
@@ -350,8 +404,10 @@ class App extends Component {
                     <Drawing
                         lines={this.state.lines}
                         color={this.state.colors}
+                        fill={this.state.fills}
                         isDrawing={this.state.isDrawing}
                         width={this.state.widths}
+                        isExtraPrettyfied = {this.state.isExtraPrettyfied}
                     />
                 </div>
                 {

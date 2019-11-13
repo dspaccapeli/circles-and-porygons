@@ -1,9 +1,7 @@
-import React from 'react'
-import { TwitterPicker } from 'react-color'
-import Slider from 'react-rangeslider'
-import 'react-rangeslider/lib/index.css'
-
-//import Button from 'react-bootstrap/Button';
+import React from 'react';
+import { TwitterPicker } from 'react-color';
+import Slider from 'react-rangeslider';
+import 'react-rangeslider/lib/index.css';
 
 class Sidebar extends React.Component {
     constructor(props){
@@ -12,6 +10,8 @@ class Sidebar extends React.Component {
         this.state = {
             displayColorPicker: false,
             colorPicked: '#4284f5',
+            displayColorPickerFill: false,
+            colorPickedFill: 'transparent',
             width: 5,
         };
     }
@@ -27,6 +27,19 @@ class Sidebar extends React.Component {
     handleChangeColor = (color) => {
         this.setState({ colorPicked: color.hex });
         this.props.onColorPicked(color.hex);
+    };
+
+    handleClickPickerFill = () => {
+        this.setState({ displayColorPickerFill: !this.state.displayColorPickerFill })
+    };
+
+    handleClosePickerFill = () => {
+        this.setState({ displayColorPickerFill: false })
+    };
+
+    handleChangeColorFill = (color) => {
+        this.setState({ colorPickedFill: color.hex });
+        this.props.onColorPickedFill(color.hex);
     };
 
     handleChangeWidth = (width) => {
@@ -46,7 +59,7 @@ class Sidebar extends React.Component {
             left: '0px',
         };
         const sidebar = {
-            width: '15%',
+            width: 200,
             backgroundColor: 'royalblue',
             position: 'absolute',
             height: '100vh',
@@ -69,6 +82,13 @@ class Sidebar extends React.Component {
             height: '14px',
             borderRadius: '2px',
             background: this.state.colorPicked,
+        };
+
+        const smallColoredSquareFill = {
+            width: '14px',
+            height: '14px',
+            borderRadius: '2px',
+            background: this.state.colorPickedFill,
         };
 
         const squareContainer = {
@@ -94,7 +114,7 @@ class Sidebar extends React.Component {
                     Clear Canvas
                 </button>
                 <div style={ Object.assign({}, sidebarMenuElement, {color: 'white'}, {alignItems: 'baseline'})} className="row">
-                    <p>Color</p>
+                    <p>Stroke Color</p>
                     <div
                         style={ squareContainer }
                         onClick={this.handleClickPicker}
@@ -108,17 +128,34 @@ class Sidebar extends React.Component {
                         />
                     </div> : null }
                 </div>
-                <div style={ Object.assign({}, sidebarMenuElement, {color: 'white'}) }>
-                    <p>Width</p>
+
+                <div style={ Object.assign({}, sidebarMenuElement, {color: 'white'}, {alignItems: 'baseline'})} className="row">
+                    <p>Fill Color</p>
+                    <div
+                        style={ squareContainer }
+                        onClick={this.handleClickPickerFill}
+                    >
+                        <div style={ smallColoredSquareFill } />
+                    </div>
+                    { this.state.displayColorPickerFill ? <div style={ popover }>
+                        <div style={ cover } onClick={ this.handleClosePickerFill }/>
+                        <TwitterPicker
+                            onChangeComplete={ this.handleChangeColorFill }
+                        />
+                    </div> : null }
                 </div>
+
                 <div className='slider orientation-reversed'>
                     <div className='slider-group'>
-                        <div className='slider-vertical'>
+                        <div className='slider-horizontal'>
+                            <div style={ Object.assign({}, sidebarMenuElement, {color: 'white'}) }>
+                                <p>Stroke Width</p>
+                            </div>
                             <Slider
                                 min={1}
                                 max={20}
                                 value={this.state.width}
-                                orientation='vertical'
+                                orientation='horizontal'
                                 onChange={this.handleChangeWidth}
                             />
                         </div>
@@ -126,12 +163,19 @@ class Sidebar extends React.Component {
                 </div>
                 <button
                     style={ sidebarMenuElement }
+                    className="btn-success"
+                    variant="light"
+                    onClick={() => this.props.onTogglePrettify()}
+                >
+                    { this.props.onTogglePreffifyStatus() ? <div dangerouslySetInnerHTML={{__html: this.props.onTogglePreffifyStatus()}}/> : <div> Extra prettify </div> }
+                </button>
+                <button
+                    style={ sidebarMenuElement }
                     className="btn-danger"
                     onClick={() => this.props.onToggleHandDrawing()}
                     disabled={this.props.onModelLoading() == "loading..."}
                 >
                     { this.props.onModelLoading() ? <div dangerouslySetInnerHTML={{__html: this.props.onModelLoading()}}/> : <div> Hand Drawing </div> }
-                    {/* this.props.onModelWorking ? <div dangerouslySetInnerHTML={{__html: this.props.onModelWorking}}/> : null */}
                 </button>
             </div>
         );
