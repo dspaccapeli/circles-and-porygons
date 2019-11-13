@@ -1,6 +1,6 @@
-![icon](https://raw.githubusercontent.com/dspaccapeli/circles-and-porygons/master/public/favicon.ico)
+![icon](https://raw.githubusercontent.com/dspaccapeli/circles-and-porygons/master/public/favicon.ico?raw=true)
 # Circles and Porygons
-
+![screenshot](https://github.com/dspaccapeli/circles-and-porygons/blob/master/public/example_image.png?raw=true)
 ## Description of the project
 This drawing application “prettifies” drawn shapes. For example, if the user draws a rough rectangle the application is going to make it pretty/regularized (i.e. with four straight lines) and of the appropriate size. The user will be able to change the color of the stroke, the fill and also the width of the stroke before drawing. We also developed:
 - The ability to draw using the user’s hand through the webcam;
