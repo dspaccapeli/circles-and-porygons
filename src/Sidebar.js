@@ -98,7 +98,7 @@ class Sidebar extends React.Component {
                     <p>Fill Color</p>
                     <div
                         className="square-container"
-                        onClick={this.handleClickPicker}
+                        onClick={this.handleClickPickerFill}
                     >
                         <div style={ smallColoredSquareFill } />
                     </div>
