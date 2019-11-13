@@ -77,6 +77,7 @@ class Sidebar extends React.Component {
                 >
                     Clear Canvas
                 </button>
+
                 <div className="sidebar-menu-element picker-text-style row">
                     <p>Stroke Color</p>
                     <div
@@ -96,19 +97,18 @@ class Sidebar extends React.Component {
                 <div className="sidebar-menu-element picker-text-style row">
                     <p>Fill Color</p>
                     <div
-                        style={ squareContainer }
-                        onClick={this.handleClickPickerFill}
+                        className="square-container"
+                        onClick={this.handleClickPicker}
                     >
                         <div style={ smallColoredSquareFill } />
                     </div>
-                    { this.state.displayColorPickerFill ? <div style={ popover }>
-                        <div style={ cover } onClick={ this.handleClosePickerFill }/>
+                    { this.state.displayColorPickerFill ? <div className="popover">
+                        <div className="cover" onClick={ this.handleClosePickerFill }/>
                         <TwitterPicker
                             onChangeComplete={ this.handleChangeColorFill }
                         />
                     </div> : null }
-
-
+                </div>
                 <div className='slider orientation-reversed'>
                     <div className='slider-group'>
                         <div className='slider-horizontal'>
