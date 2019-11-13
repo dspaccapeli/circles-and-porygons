@@ -1,4 +1,9 @@
-// Inspired by: http://paulbourke.net/geometry/pointlineplane/
+/*
+    Inspired by
+    http://paulbourke.net/geometry/pointlineplane/
+
+    Calculate the intersection point between to lines A̅B̅ and C̅D̅
+ */
 
 export default function lineIntersect(A, B, C, D)
 {

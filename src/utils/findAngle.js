@@ -1,3 +1,6 @@
+/*
+    Calculate the angle AB̂C
+ */
 export default function findAngle(A,B,C) {
     let AB = Math.hypot(B.get('x')-A.get('x'), B.get('y')-A.get('y'));
     let BC = Math.hypot(B.get('x')-C.get('x'), B.get('y')-C.get('y'));

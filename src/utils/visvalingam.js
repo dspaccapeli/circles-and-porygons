@@ -1,144 +1,139 @@
+// Import to use Heap data structures -> used in the algorithm
 let heap = require('sterta');
 
+/*
+    Inspired by
+    Simple Visvalingam: https://github.com/pirxpilot/vis-why
 
-// IMPLEMENTATION INSPIRATION
-// Simple Visvalingam
-// https://github.com/pirxpilot/vis-why
+    polyline: polyline data structure -> List(Map{x,y})
+    limit: the maximum number of point in the resulting polyline
+*/
+export default function visvalingam(polyline, limit) {
+    // Exclude case in which the algorithm is not needed
+    if (polyline.length < 3) {return polyline;}
+    if (limit < 3) {return [polyline[0], polyline[polyline.length - 1]];}
+    if (polyline.length <= limit) {return polyline;}
 
-function area(a, b, c) {
-    return Math.abs(
-        (a.get('x') - c.get('x')) * (b.get('y') - a.get('y')) - (a.get('x') - b.get('x')) * (c.get('y') - a.get('y'))
-    );
+    // Create an heap with all the triangle areas
+    let triangleAreaHeap = createHeap(polyline);
+
+    // Empty heap -> straight line
+    if (!triangleAreaHeap.first) {
+        return [polyline[0], polyline[polyline.length - 1]];
+    }
+
+    // Iteratively eliminate triangles up to the limit
+    // N.B. Limit is in the number of points, but we are counting triangles
+    eliminate(triangleAreaHeap, limit - 2);
+
+    return reconstructPolyline(triangleAreaHeap.first);
 }
 
-
-function areaCompare(p, q) {
-    return p.area - q.area;
-}
-
-
-
-function calculate(poly, area) {
+function createHeap(polyline) {
     let i,
-        ts = { heap: heap(areaCompare, true) },
+        triangleAreaHeap = { heap: heap(areaCompare, true) },
         triangle,
-        trianglePrev,
-        a = poly[0], b, c = poly[1],
+        previousTriangle,
+        a = polyline[0], b, c = polyline[1],
         list = [];
 
     // calculate areas
-    for (i = 2; i < poly.length; i++) {
+    for (i = 2; i < polyline.length; i++) {
         b = c;
-        c = poly[i];
+        c = polyline[i];
+        // Calculate area of the current triangle and store
+        // its points in a JSON
         triangle = {
             a: a,
             b: b,
             c: c,
             area: area(a, b, c),
             next: null,
-            prev: trianglePrev,
+            prev: previousTriangle,
             _heapIndex: 0
         };
+
         if (!triangle.area) {
             continue;
         }
+
         a = b;
-        if (trianglePrev) {
-            trianglePrev.next = triangle;
+
+        if (previousTriangle) {
+            previousTriangle.next = triangle;
         }
+
+        // Store the JSON triangle object in a list
         list.push(triangle);
-        trianglePrev = triangle;
+        previousTriangle = triangle;
     }
 
-    ts.first = list[0];
+    // Create a heap
+    triangleAreaHeap.first = list[0];
+    triangleAreaHeap.heap.rebuild(list);
 
-    // create a heap
-    ts.heap.rebuild(list);
-
-    return ts;
+    return triangleAreaHeap;
 }
 
+// Calculate the area of a triangle
+function area(a, b, c) {
+    return Math.abs(
+        (a.get('x') - c.get('x')) * (b.get('y') - a.get('y')) - (a.get('x') - b.get('x')) * (c.get('y') - a.get('y'))
+    );
+}
 
-function eliminate(ts, limit, area) {
+// Comparison function to build the heap
+function areaCompare(p, q) {
+    return p.area - q.area;
+}
+
+// Eliminate n elements from the heap
+function eliminate(triangleAreaHeap, limit) {
     let triangle,
-        prevTriangle,
+        previousTriangle,
         nextTriangle,
-        counter = ts.heap.size() - limit;
+        counter = triangleAreaHeap.heap.size() - limit;
 
+    // Iteratively eliminate points
     while(counter-- > 0) {
-        triangle = ts.heap.pop();
-        prevTriangle = triangle.prev;
+        triangle = triangleAreaHeap.heap.pop();
+        previousTriangle = triangle.prev;
         nextTriangle = triangle.next;
 
-        // recalculate neighbors
-        if (prevTriangle) {
-            ts.heap.remove(prevTriangle);
-            prevTriangle.next = triangle.next;
-            prevTriangle.c = triangle.c;
-            prevTriangle.area = area(prevTriangle.a, prevTriangle.b, prevTriangle.c);
-            ts.heap.push(prevTriangle);
+        // Recalculate neighbors
+        if (previousTriangle) {
+            triangleAreaHeap.heap.remove(previousTriangle);
+            previousTriangle.next = triangle.next;
+            previousTriangle.c = triangle.c;
+            previousTriangle.area = area(previousTriangle.a, previousTriangle.b, previousTriangle.c);
+            triangleAreaHeap.heap.push(previousTriangle);
         } else {
-            ts.first = triangle.next;
+            triangleAreaHeap.first = triangle.next;
         }
         if (nextTriangle) {
-            ts.heap.remove(nextTriangle);
+            triangleAreaHeap.heap.remove(nextTriangle);
             nextTriangle.prev = triangle.prev;
             nextTriangle.a = triangle.a;
             nextTriangle.area = area(nextTriangle.a, nextTriangle.b, nextTriangle.c);
-            ts.heap.push(nextTriangle);
+            triangleAreaHeap.heap.push(nextTriangle);
         }
 
     }
 }
 
-
-function collect(triangle) {
-    let poly = [triangle.a];
+// Reconstruct the polyline from the triangle heap
+function reconstructPolyline(triangle) {
+    let polyline = [triangle.a];
 
     while(true) {
-        poly.push(triangle.b);
+        polyline.push(triangle.b);
         if (!triangle.next) {
             break;
         }
         triangle = triangle.next;
     }
 
-    poly.push(triangle.c);
+    polyline.push(triangle.c);
 
-    return poly;
-}
-
-
-export default function visvalingam(poly, limit) {
-
-    /*
-    let firstPoint = poly[0];
-    let secondPoint = poly[Math.floor(poly.length/3)];
-    let thirdPoint = poly[Math.floor(poly.length*0.67)];
-
-    let areaPoly = area(firstPoint, secondPoint, thirdPoint);
-    */
-
-    if (poly.length < 3) {
-        return poly;
-    }
-
-    if (limit < 3) {
-        return [poly[0], poly[poly.length - 1]];
-    }
-
-    if (poly.length <= limit) {
-        return poly;
-    }
-
-    let ts = calculate(poly, area);
-
-    if (!ts.first) {
-        // empty heap - straight line with all triangles empty
-        return [poly[0], poly[poly.length - 1]];
-    }
-
-    eliminate(ts, limit - 2, area); // limit is in points, and we are counting triangles
-
-    return collect(ts.first);
+    return polyline;
 }
