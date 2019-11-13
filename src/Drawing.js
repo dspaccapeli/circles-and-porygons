@@ -59,7 +59,6 @@ function DrawingLine({ line, color, fill, width }) {
                 return `${p.get('x')} ${p.get('y')}`;
             })
             .join(" L ");
-    console.log(pathData);
 
     return <path className="path" d={pathData} fill={fill} stroke={color} strokeWidth={width} />;
 }
@@ -67,8 +66,6 @@ function DrawingLine({ line, color, fill, width }) {
 
 function DrawingLineE({ line, color, fill, width, isExtraPrettyfied }) {
     let pathData = "";
-    console.log(isExtraPrettyfied);
-    console.log(color);
 
     if (isExtraPrettyfied){
 
@@ -77,16 +74,12 @@ function DrawingLineE({ line, color, fill, width, isExtraPrettyfied }) {
             let getFirstPoint = 2000;
             let he = 0, wi = 0;
 
-            console.log("Prettify and TRIANGLE");
             for(let i = 0; i<line.size; i++){
                 if( (line.get(i).get("x") + line.get(i).get("y")) < getFirstPoint){
                     getFirstPoint = (line.get(i).get("x") + line.get(i).get("y"));
                     firstPointIndex = i;
                 }
             }
-
-            console.log(line.get(firstPointIndex + 1).get("x"));
-
 
             if((line.get(firstPointIndex + 1).get("x") - (line.get(firstPointIndex).get("x"))) > (line.get(firstPointIndex + 3).get("x") - (line.get(firstPointIndex).get("x")))){
                 wi = line.get(firstPointIndex + 1).get("x") - line.get(firstPointIndex).get("x");
@@ -109,15 +102,12 @@ function DrawingLineE({ line, color, fill, width, isExtraPrettyfied }) {
             let getLowestHeight = 900;
             let a = 0; //triangle parameter a
             let h = 0; // triangle parameter h
-            console.log("Prettify and TRIANGLE");
             for(let i = 0; i<line.size; i++){
                 if(line.get(i).get("y")<getLowestHeight){
                     getLowestHeight = line.get(i).get("y");
                     highestPointIndex = i;
                 }
             }
-
-            console.log(line.get(highestPointIndex));
 
             //By default the user will get the biggest rectangle
             if((line.get(highestPointIndex + 1).get("y") - line.get(highestPointIndex).get("y")) > (line.get(highestPointIndex + 1).get("x") - line.get(highestPointIndex).get("x"))){
@@ -153,7 +143,6 @@ function DrawingLineE({ line, color, fill, width, isExtraPrettyfied }) {
                 return `${p.get('x')} ${p.get('y')}`;
             })
             .join(" L ");
-    console.log(pathData);
 
     return <path className="path" d={pathData} fill={fill} stroke={color} strokeWidth={width} />;
 }
