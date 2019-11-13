@@ -1,6 +1,14 @@
 import { Map } from 'immutable';
 import lineIntersect from "./lineIntersect";
 
+const acceptedGap = 30;
+
+/*
+    Close the polygon at either the first line
+    intersection or if the gap between first and
+    last point is smaller than _acceptedGap_ pixels
+ */
+
 export default function closePolygon(polygon) {
     let i,
         x_intersect,
@@ -41,8 +49,6 @@ export default function closePolygon(polygon) {
             break;
         }
     }
-
-    let acceptedGap = 30;
 
     if (!foundIntersection){
         if (Math.hypot(polygon[polygon.length -1].get('x')-polygon[0].get('x'), polygon[polygon.length -1].get('y')-polygon[0].get('y')) > acceptedGap){

@@ -1,22 +1,22 @@
+// Import React components
 import React, { Component } from 'react';
-
+// Adding css styling
 import './App.css';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-
+// Using external libraries to use immutable collections
 import {List, updateIn, remove, Map} from 'immutable';
-
+// Import the two child components
 import Sidebar from "./Sidebar";
 import Drawing from "./Drawing";
-
+// Utility functions to process line-points of the shapes
 import relativeCoordinates from "./utils/relativeCoordinates";
 import processPoints from "./utils/processPoints";
-
+// Import ML library to detect the hand position
 import * as handTrack from 'handtrackjs';
 
 class App extends Component {
     constructor(props) {
         super(props);
-
+        // Initialize React state - they trigger re-rendering
         this.state = {
             lines: new List(),
             isDrawing: false,
@@ -31,47 +31,46 @@ class App extends Component {
             modelIsLoading: false,
             extraPrettify: false,
         };
-
         this.extraPrettifyStatus = false;
+
+        // Initialize class state parameters, handtracking related
         this.modelLoaded = false;
         this.detecting = null;
-
         this.model = null;
+        this.currentHandCoordinates = { x: -1, y: -1};
+        this.handDrawing = false;
+        this.context = null;
+        this.handDrawingScaleFactorX = 1;
+        this.handDrawingScaleFactorY = 1;
+        // Setting up the intial handtracking recognizer parameters
         this.modelParams = {
             maxNumBoxes: 1,
             scoreThreshold: 0.7,
         };
-
-        this.currentHandCoordinates = { x: -1, y: -1};
-        this.previousHandCoordinates = { x: -1, y: -1};
-        this.handDrawing = false;
-
+        // Setting up references for DIV elements manipulation
         this.canvasRef = React.createRef();
         this.videoRef = React.createRef();
         this.webcamCanvasRef = React.createRef();
-
-        this.context = null;
-
-        this.handDrawingScaleFactorX = 1;
-        this.handDrawingScaleFactorY = 1;
-
+        // Binding function to make them accessible
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
     }
-
+    // Add eventListener to all the doucument
     componentDidMount() {
         document.addEventListener("mouseup", this.handleMouseUp);
         document.addEventListener("keydown", this.handleKeyDown);
         document.addEventListener("keyup", this.handleKeyUp);
     }
-
+    // Remove on component creation (best practice)
     componentWillUnmount() {
         document.removeEventListener("mouseup", this.handleMouseUp);
         document.removeEventListener("keydown", this.handleKeyDown);
         document.removeEventListener("keyup", this.handleKeyUp);
     }
-
+    // On update get reference for the webcam display DIV and the scaling factor
+    // For scaling factor we mean a multiplier that is applied to transform
+    // a position in webcam-space to canvas-space
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.webcamCanvasRef.current){
             this.context = this.webcamCanvasRef.current.getContext('2d');
@@ -98,6 +97,7 @@ class App extends Component {
         console.log(this.extraPrettifyStatus);
     }
 
+    // Turn ON or OFF handtracking, kickstart it if necessary
     toggleHandTracking = () => {
         if (!this.model && !this.modelLoaded) {
             this.setState({
@@ -114,8 +114,9 @@ class App extends Component {
         } else {
             this.switchHandTracking();
         }
-    }
+    };
 
+    // Pre or Post process operations for capturing video
     switchHandTracking = () => {
         if (!this.state.videoOn) {
             this.modelLoaded = true;
@@ -135,7 +136,7 @@ class App extends Component {
             });
         }
     };
-
+    // Start handtracking
     startHandTracking = () => {
         handTrack.startVideo(this.videoRef.current).then( status => {
             console.log("video started", status);
@@ -145,7 +146,7 @@ class App extends Component {
             }
         });
     };
-
+    // Run detection on a loop and detect the position per each frame
     runDetection = () => {
         if (!this.videoRef.current){
             return;
@@ -163,13 +164,11 @@ class App extends Component {
                 this.videoRef.current);
 
             if (predictions.length > 0){
-                this.previousHandCoordinates = this.currentHandCoordinates;
-
                 const x = predictions[0].bbox[0];
                 const y = predictions[0].bbox[1];
                 const width = predictions[0].bbox[2];
                 const height = predictions[0].bbox[3];
-
+                // Find center point of the hand bounding box
                 const middleValueX = x + width/2;
                 const middleValueY = y + height/2;
                 this.currentHandCoordinates.x = Math.floor(this.handDrawingScaleFactorX*middleValueX-this.canvasRef.current.getBoundingClientRect().left);
@@ -179,22 +178,18 @@ class App extends Component {
                     this.drawHandStroke();
                 }
             }
-
-
+            // Loop the detection at the next frame
             if (this.state.videoOn) {
                 requestAnimationFrame(this.runDetection);
             }
         });
     };
-
+    // If the user is drawing display and act accordingly the different cases
     drawHandStroke(){
         const point = new Map({
             x: Math.floor(this.currentHandCoordinates.x*this.handDrawingScaleFactorX),
             y: Math.floor(this.currentHandCoordinates.y*this.handDrawingScaleFactorY),
         });
-
-        console.log(point);
-
         // if first stroke
         if (this.state.lines.size === 0){
             this.setState(prevState => ({
@@ -242,7 +237,7 @@ class App extends Component {
             }
         }
     }
-
+    // Event handler for mouse drawing
     handleMouseDown(mouseEvent) {
         if (mouseEvent.button !== 0 || this.state.videoOn) {
             return;
@@ -259,7 +254,6 @@ class App extends Component {
             isDrawing: true
         }));
     }
-
     handleMouseMove(mouseEvent) {
         if (!this.state.isDrawing || this.state.videoOn) {
             return;
@@ -271,7 +265,6 @@ class App extends Component {
             lines: updateIn(prevState.lines, [prevState.lines.size - 1], line => line.push(point)),
         }));
     }
-
     handleMouseUp() {
         if (this.state.videoOn){
             return;
@@ -297,7 +290,7 @@ class App extends Component {
             }
         }
     }
-
+    // Event handler to trigger hand drawing on canvas
     handleKeyDown = (keyEvent) => {
         if(keyEvent.code === "KeyD" && !this.state.isDrawing) {
             if (this.state.videoOn) {
@@ -306,7 +299,6 @@ class App extends Component {
             }
         }
     };
-
     handleKeyUp = (keyEvent) => {
         if(keyEvent.code === "KeyD"){
 
@@ -333,7 +325,7 @@ class App extends Component {
             }
         }
     };
-
+    // Clear the canvas of all the previous strokes
     clearCanvas = () => {
         this.setState({
             lines: new List(),
@@ -343,25 +335,27 @@ class App extends Component {
             isExtraPrettyfied: new List(),
         });
     };
-
+    // Change the stroke color
     changeColor = (color) => {
         this.setState({
             strokeColor: color,
         });
     };
-
+    
+    // Change the fill color
     changeColorFill = (color) => {
         this.setState({
             fillColor: color,
         });
     };
 
+    // Change the stroke width
     changeStroke = (width) => {
         this.setState({
             strokeWidth: width,
         });
     };
-
+    // Render the application
     render() {
         return (
             <div>

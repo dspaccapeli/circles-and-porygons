@@ -3,16 +3,22 @@ import isCircle from "./utils/isCircle";
 import getPolygonCentroid from "./utils/getPolygonCentroid";
 import React from "react";
 
+/*
+    Draw the polygons as SVG, recognizing
+    whether they are circles beforehand
+
+    lines: collection of strokes (points)
+    color: list of colors corresponding to each stroke
+    width: list of widths corresponding to each stroke
+    isDrawing: boolean indicating if they user is currently drawing
+ */
 
 export default function Drawing({ lines, color, fill, isDrawing, width, isExtraPrettyfied }) {
-
-    /*let zipLineColor = new List(lines.zip(color));
-    console.log(typeof zipLineColor)
-    zipLineColor = zipLineColor.zip(width);*/
 
     const toZip = fromJS([lines, color, fill, width, isExtraPrettyfied]);
     const zipped = toZip.get(0).zip(...toZip.rest());
 
+    // Dynamically decide whether to prettify the last (current) stroke
     if (isDrawing){
         return (
             <svg className="drawing">
@@ -158,7 +164,6 @@ function DrawingCircle({ line, color, fill, width }) {
     let newLine = line.toArray();
 
     let centroid = getPolygonCentroid(newLine);
-
     let radius = Math.floor(Math.hypot(centroid.get('x')-newLine[0].get('x'), centroid.get('y')-newLine[0].get('y')));
 
     return <circle cx={centroid.get('x')} cy={centroid.get('y')} r={radius} fill={fill} stroke={color} strokeWidth={width} />;

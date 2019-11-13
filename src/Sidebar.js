@@ -1,12 +1,17 @@
-import React from 'react';
-import { TwitterPicker } from 'react-color';
-import Slider from 'react-rangeslider';
-import 'react-rangeslider/lib/index.css';
+// Import React components
+import React from 'react'
+// Import a Color Picker implementation
+import { TwitterPicker } from 'react-color'
+// Adding css styling
+import './Sidebar.css';
+// Import a Slider implementation
+import Slider from 'react-rangeslider'
+import 'react-rangeslider/lib/index.css'
 
 class Sidebar extends React.Component {
     constructor(props){
         super(props);
-
+        // Initialize React state - they trigger re-rendering
         this.state = {
             displayColorPicker: false,
             colorPicked: '#4284f5',
@@ -16,14 +21,13 @@ class Sidebar extends React.Component {
         };
     }
 
+    // Setup event handlers
     handleClickPicker = () => {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
     };
-
     handleClosePicker = () => {
         this.setState({ displayColorPicker: false })
     };
-
     handleChangeColor = (color) => {
         this.setState({ colorPicked: color.hex });
         this.props.onColorPicked(color.hex);
@@ -48,35 +52,7 @@ class Sidebar extends React.Component {
     };
 
     render() {
-        const popover = {
-            position: 'absolute',
-        };
-        const cover = {
-            position: 'fixed',
-            top: '0px',
-            right: '0px',
-            bottom: '0px',
-            left: '0px',
-        };
-        const sidebar = {
-            width: 200,
-            backgroundColor: 'royalblue',
-            position: 'absolute',
-            height: '100vh',
-            border: '3px solid royalblue',
-            alignItems: 'center',
-            display: 'grid',
-            paddingRight: '20px',
-            paddingLeft: '20px',
-            fontFamily: "Arial,Helvetica Neue,Helvetica,sans-serif",
-        };
-
-        const sidebarMenuElement = {
-            textAlign: 'center',
-            verticalAlign: 'middle',
-            gridRowGap: '5px'
-        };
-
+        // Initialize inline styling to change dynamically the picker color
         const smallColoredSquare = {
             width: '14px',
             height: '14px',
@@ -91,45 +67,33 @@ class Sidebar extends React.Component {
             background: this.state.colorPickedFill,
         };
 
-        const squareContainer = {
-            padding: '2px',
-            background: '#fff',
-            borderRadius: '1px',
-            boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
-            display: 'inline-table',
-            cursor: 'pointer',
-            width: '16px',
-            height: '16px',
-            marginLeft: '10px'
-        };
-
+        // Render the sidebar element by element
         return (
-            <div style={ sidebar }>
+            <div className="sidebar" >
                 <button
-                    style={ sidebarMenuElement }
-                    className="btn-secondary"
+                    className="sidebar-menu-element btn-secondary"
                     onClick={() => this.props.onClearCanvas()}
                     variant="light"
                 >
                     Clear Canvas
                 </button>
-                <div style={ Object.assign({}, sidebarMenuElement, {color: 'white'}, {alignItems: 'baseline'})} className="row">
+                <div className="sidebar-menu-element picker-text-style row">
                     <p>Stroke Color</p>
                     <div
-                        style={ squareContainer }
+                        className="square-container"
                         onClick={this.handleClickPicker}
                     >
                         <div style={ smallColoredSquare } />
                     </div>
-                    { this.state.displayColorPicker ? <div style={ popover }>
-                        <div style={ cover } onClick={ this.handleClosePicker }/>
+                    { this.state.displayColorPicker ? <div className="popover">
+                        <div className="cover" onClick={ this.handleClosePicker }/>
                         <TwitterPicker
                             onChangeComplete={ this.handleChangeColor }
                         />
                     </div> : null }
                 </div>
 
-                <div style={ Object.assign({}, sidebarMenuElement, {color: 'white'}, {alignItems: 'baseline'})} className="row">
+                <div className="sidebar-menu-element picker-text-style row">
                     <p>Fill Color</p>
                     <div
                         style={ squareContainer }
@@ -143,12 +107,12 @@ class Sidebar extends React.Component {
                             onChangeComplete={ this.handleChangeColorFill }
                         />
                     </div> : null }
-                </div>
+
 
                 <div className='slider orientation-reversed'>
                     <div className='slider-group'>
                         <div className='slider-horizontal'>
-                            <div style={ Object.assign({}, sidebarMenuElement, {color: 'white'}) }>
+                            <div className="sidebar-menu-element picker-text-style">
                                 <p>Stroke Width</p>
                             </div>
                             <Slider
@@ -162,16 +126,13 @@ class Sidebar extends React.Component {
                     </div>
                 </div>
                 <button
-                    style={ sidebarMenuElement }
-                    className="btn-success"
-                    variant="light"
+                    className="sidebar-menu-element btn-success"
                     onClick={() => this.props.onTogglePrettify()}
                 >
                     { this.props.onTogglePreffifyStatus() ? <div dangerouslySetInnerHTML={{__html: this.props.onTogglePreffifyStatus()}}/> : <div> Extra prettify </div> }
                 </button>
                 <button
-                    style={ sidebarMenuElement }
-                    className="btn-danger"
+                    className="sidebar-menu-element btn-danger"
                     onClick={() => this.props.onToggleHandDrawing()}
                     disabled={this.props.onModelLoading() == "loading..."}
                 >
